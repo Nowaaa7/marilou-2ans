@@ -30,9 +30,7 @@
             </div>
 
             <div class="user-actions">
-                <button class="add-listing-btn" id="btn-open-add">
-                    Mettre mon grain de sel
-                </button>
+                <button class="add-listing-btn" id="btn-open-add">Mettre mon grain de sel</button>
                 <div class="user-profile">
                     <span class="material-symbols-rounded">menu</span>
                     <div class="avatar">
@@ -43,18 +41,17 @@
         </div>
     </header>
 
-    <nav class="categories-bar" id="dynamic-categories-bar">
-        </nav>
+    <nav class="categories-bar" id="dynamic-categories-bar"></nav>
 
-    <main class="listings-grid" id="main-grid">
-        </main>
+    <main class="listings-grid" id="main-grid"></main>
 
     <dialog id="modal-add" class="modal">
         <div class="modal-container">
             <header class="modal-header">
                 <button class="close-btn" id="btn-close-add"><span class="material-symbols-rounded">close</span></button>
                 <h2>Créer une nouvelle escapade</h2>
-                <div></div> </header>
+                <div></div>
+            </header>
             
             <div class="modal-body">
                 <form id="form-add-listing">
@@ -79,13 +76,12 @@
                         <div class="input-group">
                             <label for="category-input">Ambiance / Thématique</label>
                             <input type="text" id="category-input" list="category-list" placeholder="Ex: Montagne, Resto chic, Voyage..." required>
-                            <datalist id="category-list">
-                                </datalist>
+                            <datalist id="category-list"></datalist>
                         </div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div class="input-group">
-                                <label for="budget">Budget 🐷</label>
+                                <label for="budget">Budget 💰</label>
                                 <select id="budget">
                                     <option value="Gratuit">Gratuit</option>
                                     <option value="€">€ (Pas cher)</option>
@@ -111,8 +107,17 @@
                             </label>
                             
                             <div id="date-done-container" style="display: none; margin-top: 15px;">
-                                <label for="date-done">Quand y sommes-nous allés mon amour ?</label>
-                                <input type="date" id="date-done" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid white; box-sizing: border-box;">
+                                <label for="date-done" style="display: block; margin-bottom: 5px;">Quand y sommes-nous allés mon amour ?</label>
+                                <input type="date" id="date-done" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid white; box-sizing: border-box; margin-bottom: 15px;">
+                                
+                                <label for="pig-rating" style="display: block; margin-bottom: 5px;">Notre note Cochon 🐷</label>
+                                <select id="pig-rating" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid white; box-sizing: border-box;">
+                                    <option value="5">🐷🐷🐷🐷🐷 (Parfait !)</option>
+                                    <option value="4">🐷🐷🐷🐷 (Vraiment top)</option>
+                                    <option value="3">🐷🐷🐷 (Sympa)</option>
+                                    <option value="2">🐷🐷 (Bof...)</option>
+                                    <option value="1">🐷 (À oublier)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -139,7 +144,8 @@
             <header class="modal-header">
                 <button class="close-btn" id="btn-close-detail"><span class="material-symbols-rounded">close</span></button>
                 <h2 id="detail-title">Chargement...</h2>
-                <div></div> </header>
+                <div></div> 
+            </header>
             
             <div class="modal-body detail-body">
                 <div class="gallery-wrapper">
@@ -154,8 +160,8 @@
                     
                     <div class="card-meta">
                         <span id="detail-duration">⏱️ Chargement...</span>
-                        <span id="detail-budget">💰 Budget : Chargement...</span>
-                    </div>
+                        <span id="detail-budget">💰 Chargement...</span>
+                        <span id="detail-rating">🐷 Chargement...</span> </div>
 
                     <p class="card-date" id="detail-category">Catégorie : Chargement...</p>
                     
@@ -164,8 +170,7 @@
                         <p id="detail-description" class="detail-description">Chargement...</p>
                     </div>
                     
-                    <div id="detail-maps-container" style="margin-top: 20px;">
-                        </div>
+                    <div id="detail-maps-container" style="margin-top: 20px;"></div>
                 </div>
             </div>
         </div>
