@@ -67,22 +67,6 @@
     </nav>
 
     <main class="listings-grid" id="main-grid">
-        <article class="listing-card">
-            <div class="card-image-wrapper">
-                <img src="https://images.unsplash.com/photo-1518182170546-076616fdcb18?auto=format&fit=crop&q=80&w=800" alt="Forêt enchantée" class="card-image">
-                <button class="favorite-btn"><span class="material-symbols-rounded">favorite</span></button>
-            </div>
-            <div class="card-info">
-                <div class="card-header">
-                    <h3 class="card-title">Week-end en Forêt</h3>
-                    <span class="card-rating"><span class="material-symbols-rounded star">star</span> 5.0</span>
-                </div>
-                <p class="card-location">Fontainebleau, France</p>
-                <p class="card-date">Proposé par Toi</p>
-                <p class="card-status"><span class="highlight">À planifier</span></p>
-            </div>
-        </article>
-        
         </main>
 
     <dialog id="modal-add" class="modal">
@@ -104,14 +88,9 @@
                             <label for="location">Lieu exact</label>
                             <input type="text" id="location" placeholder="Ex: Sur les quais de Seine" required>
                         </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Quelques images pour me donner envie</h3>
-                        <div class="image-upload-zone">
-                            <span class="material-symbols-rounded upload-icon">cloud_upload</span>
-                            <p>Glisse tes photos ici ou <strong>parcours tes fichiers</strong></p>
-                            <input type="url" id="image-url" placeholder="Ou colle un lien d'image ici..." required>
+                        <div class="input-group">
+                            <label for="mapsLink">Lien Google Maps (Optionnel mais pratique !)</label>
+                            <input type="url" id="mapsLink" placeholder="https://goo.gl/maps/...">
                         </div>
                     </div>
 
@@ -126,9 +105,33 @@
                                 <option value="adventure">Aventure</option>
                             </select>
                         </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="input-group">
+                                <label for="budget">Budget 🐷</label>
+                                <select id="budget">
+                                    <option value="Gratuit">Gratuit</option>
+                                    <option value="€">€ (Pas cher)</option>
+                                    <option value="€€">€€ (Plaisir)</option>
+                                    <option value="€€€">€€€ (Folie !)</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="duration">Durée prévue</label>
+                                <input type="text" id="duration" placeholder="Ex: 2 heures, Le week-end..." required>
+                            </div>
+                        </div>
+
                         <div class="input-group">
                             <label for="description">Pourquoi c'est l'endroit parfait pour nous ?</label>
-                            <textarea id="description" rows="4" placeholder="J'ai vu cet endroit et ça m'a fait penser à..." required></textarea>
+                            <textarea id="description" rows="3" placeholder="J'ai vu cet endroit et ça m'a fait penser à..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Une image pour me donner envie</h3>
+                        <div class="input-group">
+                            <input type="url" id="image-url" placeholder="Colle le lien d'une image ici..." required>
                         </div>
                     </div>
                 </form>
