@@ -1,8 +1,7 @@
-// --- 1. IMPORTATION DE FIREBASE (Le "Cerveau" en temps réel) ---
+// --- 1. IMPORTATION DE FIREBASE (Ajout de deleteDoc et doc) ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// Tes clés secrètes lues depuis ton image !
 const firebaseConfig = {
   apiKey: "AIzaSyC5kR-VsR0evaMoyx4b_0GtMZTANczt6Nw",
   authDomain: "marilou-2ans.firebaseapp.com",
@@ -13,7 +12,6 @@ const firebaseConfig = {
   measurementId: "G-592LQTJ2W2"
 };
 
-// Initialisation
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -26,16 +24,14 @@ const form = document.getElementById('form-add-listing');
 const grid = document.getElementById('main-grid');
 const categoryBtns = document.querySelectorAll('.category');
 const searchBtns = document.querySelectorAll('.search-btn');
-const profileBtn = document.querySelector('.user-profile');
 
 let balades = [];
 let filtreActuel = "Tout";
 
 // --- 3. SYNCHRONISATION EN TEMPS RÉEL AVEC FIREBASE ---
 const baladesRef = collection(db, "balades");
-const q = query(baladesRef, orderBy("createdAt", "desc")); // Trie des plus récentes aux plus anciennes
+const q = query(baladesRef, orderBy("createdAt", "desc"));
 
-// "onSnapshot" écoute la base de données H24. Dès qu'il y a un changement, il met à jour le site !
 onSnapshot(q, (snapshot) => {
     balades = [];
     snapshot.forEach((doc) => {
@@ -52,7 +48,7 @@ btnCancel.addEventListener('click', (e) => {
     modal.close();
 });
 
-// --- 5. AFFICHAGE DES BALADES ---
+// --- 5. AFFICHAGE DES BALADES (AVEC NOUVELLES FONCTIONS) ---
 function renderBalades(filtre = "Tout") {
     grid.innerHTML = '';
     
@@ -60,7 +56,6 @@ function renderBalades(filtre = "Tout") {
         ? balades 
         : balades.filter(b => b.category === filtre);
 
-    // Si la base de données est vide (au tout début)
     if (baladesAffichees.length === 0) {
         grid.innerHTML = `<p style="text-align:center; width: 100%; grid-column: 1 / -1; color: var(--rose-flower); font-size: 1.2rem; font-weight: bold;">Notre carte aux trésors est vide ! Clique sur "Mettre mon grain de sel" pour ajouter notre première aventure ! 🌹🐷</p>`;
         return;
@@ -69,10 +64,15 @@ function renderBalades(filtre = "Tout") {
     baladesAffichees.forEach(balade => {
         const article = document.createElement('article');
         article.className = 'listing-card';
+        
+        // On construit la carte avec les nouvelles infos (budget, durée, maps)
+        let mapsHTML = balade.mapsLink ? `<a href="${balade.mapsLink}" target="_blank" class="map-link">📍 Itinéraire Maps</a>` : '';
+        
         article.innerHTML = `
             <div class="card-image-wrapper">
                 <img src="${balade.image}" alt="${balade.title}" class="card-image">
                 <button class="favorite-btn"><span class="material-symbols-rounded icon-heart">favorite</span></button>
+                <button class="delete-btn" data-id="${balade.id}"><span class="material-symbols-rounded">delete</span></button>
             </div>
             <div class="card-info">
                 <div class="card-header">
@@ -80,18 +80,24 @@ function renderBalades(filtre = "Tout") {
                     <span class="card-rating">🐷 5.0</span>
                 </div>
                 <p class="card-location">📍 ${balade.location}</p>
+                
+                <div class="card-meta">
+                    <span>⏱️ ${balade.duration || 'À définir'}</span>
+                    <span>💰 Budget : ${balade.budget || 'Non précisé'}</span>
+                </div>
+
                 <p class="card-date">Ambiance : ${balade.category}</p>
-                <p class="card-status"><span class="highlight">${balade.status}</span></p>
                 <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px; line-height: 1.4;">
                     ${balade.description}
                 </p>
+                ${mapsHTML}
             </div>
         `;
 
+        // Animation Cœur
         const heartBtn = article.querySelector('.favorite-btn');
         const heartIcon = article.querySelector('.icon-heart');
-        heartIcon.style.fontVariationSettings = '"FILL" 0'; // Cœur vide par défaut
-        
+        heartIcon.style.fontVariationSettings = '"FILL" 0';
         heartBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if (heartIcon.style.fontVariationSettings === '"FILL" 1') {
@@ -103,19 +109,27 @@ function renderBalades(filtre = "Tout") {
             }
         });
 
+        // 🔥 SUPPRESSION FIREBASE 🔥
+        const deleteBtn = article.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            // Demande de confirmation
+            if(confirm("Es-tu sûr(e) de vouloir supprimer cette idée de balade ? 🥺🐷")) {
+                await deleteDoc(doc(db, "balades", balade.id));
+            }
+        });
+
         grid.appendChild(article);
     });
 }
 
-// --- 6. INTERACTIVITÉ DES CATÉGORIES ET BOUTONS ---
+// --- 6. INTERACTIVITÉ DES CATÉGORIES ---
 categoryBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         categoryBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         filtreActuel = btn.querySelector('span:nth-child(2)').innerText;
-        
-        // Petite correction pour la catégorie "Nature" qui n'a pas exactement le même nom dans le menu et le formulaire
-        if(filtreActuel === "Nature") filtreActuel = "Tout"; // On affiche tout quand on clique sur le premier bouton pour simplifier
+        if(filtreActuel === "Nature") filtreActuel = "Tout"; 
         renderBalades(filtreActuel);
     });
 });
@@ -123,9 +137,8 @@ categoryBtns.forEach(btn => {
 searchBtns.forEach(btn => {
     btn.addEventListener('click', () => alert("Pas besoin de chercher, tant qu'on est ensemble, la destination n'a pas d'importance. 🥰"));
 });
-profileBtn.addEventListener('click', () => alert("Connecté en tant que : Les plus beaux amoureux du monde ! 🐷🌹"));
 
-// --- 7. ENVOYER UNE NOUVELLE BALADE VERS FIREBASE ---
+// --- 7. ENVOYER LA BALADE (AVEC LES NOUVEAUX PARAMÈTRES) ---
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -135,23 +148,25 @@ form.addEventListener('submit', async (e) => {
     if(selectCat.value === "chill") finalCategory = "Bord de mer";
     if(selectCat.value === "adventure") finalCategory = "Nocturne";
 
+    // On récupère toutes les nouvelles valeurs
     const newBalade = {
         title: document.getElementById('title').value,
         location: document.getElementById('location').value,
+        mapsLink: document.getElementById('mapsLink').value,
+        budget: document.getElementById('budget').value,
+        duration: document.getElementById('duration').value,
         image: document.getElementById('image-url').value,
         category: finalCategory,
         description: document.getElementById('description').value,
         status: "À planifier",
-        createdAt: new Date().getTime() // On sauvegarde l'heure exacte pour trier !
+        createdAt: new Date().getTime()
     };
     
-    // 🔥 C'est ici que la magie opère : on envoie à Firebase !
     await addDoc(collection(db, "balades"), newBalade);
     
     form.reset();
     modal.close();
     
-    // Revenir sur le filtre "Tout"
     categoryBtns.forEach(b => b.classList.remove('active'));
     categoryBtns[0].classList.add('active');
     filtreActuel = "Tout";
