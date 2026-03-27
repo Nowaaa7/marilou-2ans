@@ -43,28 +43,8 @@
         </div>
     </header>
 
-    <nav class="categories-bar">
-        <div class="category active">
-            <span class="material-symbols-rounded">park</span>
-            <span>Nature</span>
-        </div>
-        <div class="category">
-            <span class="material-symbols-rounded">restaurant</span>
-            <span>Restos</span>
-        </div>
-        <div class="category">
-            <span class="material-symbols-rounded">nightlife</span>
-            <span>Nocturne</span>
-        </div>
-        <div class="category">
-            <span class="material-symbols-rounded">beach_access</span>
-            <span>Bord de mer</span>
-        </div>
-        <div class="category">
-            <span class="material-symbols-rounded">castle</span>
-            <span>Culture</span>
-        </div>
-    </nav>
+    <nav class="categories-bar" id="dynamic-categories-bar">
+        </nav>
 
     <main class="listings-grid" id="main-grid">
         </main>
@@ -96,14 +76,12 @@
 
                     <div class="form-section">
                         <h3>Les détails croustillants</h3>
+                        
                         <div class="input-group">
-                            <label for="category">Ambiance</label>
-                            <select id="category">
-                                <option value="nature">Nature & Plein air</option>
-                                <option value="food">Gourmandise</option>
-                                <option value="chill">Détente & Spa</option>
-                                <option value="adventure">Aventure</option>
-                            </select>
+                            <label for="category-input">Ambiance / Thématique</label>
+                            <input type="text" id="category-input" list="category-list" placeholder="Ex: Montagne, Resto chic, Voyage..." required>
+                            <datalist id="category-list">
+                                </datalist>
                         </div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
