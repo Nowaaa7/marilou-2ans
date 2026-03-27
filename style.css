@@ -509,3 +509,25 @@ body {
     color: #155724;
     border: 1px solid #c3e6cb;
 }
+/* Bouton Modifier (Crayon) */
+.edit-btn {
+    position: absolute;
+    top: 20px;
+    left: 65px; /* Placé juste à côté de la corbeille ! */
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--leaf-green); /* En vert pour le différencier */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.edit-btn:hover {
+    background: var(--leaf-green);
+    color: white;
+    transform: scale(1.1);
+}
