@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nos Escapades | Joyeux 2 Ans</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="material-symbols-rounded logo-icon">favorite</span>
+                <span class="logo-text">NosEscapades</span>
+            </div>
+            
+            <div class="search-bar">
+                <button class="search-btn">Où aller ?</button>
+                <span class="divider"></span>
+                <button class="search-btn">Quand ?</button>
+                <span class="divider"></span>
+                <button class="search-btn search-btn-primary">
+                    <span class="material-symbols-rounded">search</span>
+                </button>
+            </div>
+
+            <div class="user-actions">
+                <button class="add-listing-btn" id="btn-open-add">
+                    Mettre mon grain de sel
+                </button>
+                <div class="user-profile">
+                    <span class="material-symbols-rounded">menu</span>
+                    <div class="avatar">
+                        <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Love&backgroundColor=ff385c" alt="Profil">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="categories-bar">
+        <div class="category active">
+            <span class="material-symbols-rounded">park</span>
+            <span>Nature</span>
+        </div>
+        <div class="category">
+            <span class="material-symbols-rounded">restaurant</span>
+            <span>Restos</span>
+        </div>
+        <div class="category">
+            <span class="material-symbols-rounded">nightlife</span>
+            <span>Nocturne</span>
+        </div>
+        <div class="category">
+            <span class="material-symbols-rounded">beach_access</span>
+            <span>Bord de mer</span>
+        </div>
+        <div class="category">
+            <span class="material-symbols-rounded">castle</span>
+            <span>Culture</span>
+        </div>
+    </nav>
+
+    <main class="listings-grid" id="main-grid">
+        <article class="listing-card">
+            <div class="card-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1518182170546-076616fdcb18?auto=format&fit=crop&q=80&w=800" alt="Forêt enchantée" class="card-image">
+                <button class="favorite-btn"><span class="material-symbols-rounded">favorite</span></button>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <h3 class="card-title">Week-end en Forêt</h3>
+                    <span class="card-rating"><span class="material-symbols-rounded star">star</span> 5.0</span>
+                </div>
+                <p class="card-location">Fontainebleau, France</p>
+                <p class="card-date">Proposé par Toi</p>
+                <p class="card-status"><span class="highlight">À planifier</span></p>
+            </div>
+        </article>
+        
+        </main>
+
+    <dialog id="modal-add" class="modal">
+        <div class="modal-container">
+            <header class="modal-header">
+                <button class="close-btn" id="btn-close-add"><span class="material-symbols-rounded">close</span></button>
+                <h2>Créer une nouvelle escapade</h2>
+                <div></div> </header>
+            
+            <div class="modal-body">
+                <form id="form-add-listing">
+                    <div class="form-section">
+                        <h3>Où veux-tu m'emmener ?</h3>
+                        <div class="input-group">
+                            <label for="title">Titre de notre aventure</label>
+                            <input type="text" id="title" placeholder="Ex: Coucher de soleil secret..." required>
+                        </div>
+                        <div class="input-group">
+                            <label for="location">Lieu exact</label>
+                            <input type="text" id="location" placeholder="Ex: Sur les quais de Seine" required>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Quelques images pour me donner envie</h3>
+                        <div class="image-upload-zone">
+                            <span class="material-symbols-rounded upload-icon">cloud_upload</span>
+                            <p>Glisse tes photos ici ou <strong>parcours tes fichiers</strong></p>
+                            <input type="url" id="image-url" placeholder="Ou colle un lien d'image ici..." required>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Les détails croustillants</h3>
+                        <div class="input-group">
+                            <label for="category">Ambiance</label>
+                            <select id="category">
+                                <option value="nature">Nature & Plein air</option>
+                                <option value="food">Gourmandise</option>
+                                <option value="chill">Détente & Spa</option>
+                                <option value="adventure">Aventure</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="description">Pourquoi c'est l'endroit parfait pour nous ?</label>
+                            <textarea id="description" rows="4" placeholder="J'ai vu cet endroit et ça m'a fait penser à..." required></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <footer class="modal-footer">
+                <button class="btn-text" id="btn-cancel">Annuler</button>
+                <button type="submit" form="form-add-listing" class="btn-primary">Ajouter à notre carte</button>
+            </footer>
+        </div>
+    </dialog>
+
+    <script src="script.js"></script>
+</body>
+</html>
