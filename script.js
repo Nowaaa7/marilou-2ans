@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC5kR-VsR0evaMoyx4b_0GtMZTANczt6Nw",
@@ -40,7 +40,7 @@ const btnGalleryPrev = document.getElementById('btn-gallery-prev');
 const btnGalleryNext = document.getElementById('btn-gallery-next');
 const galleryCounter = document.getElementById('gallery-counter');
 
-// NOUVEAU : Checkbox date
+// Checkbox date
 const isDoneCheckbox = document.getElementById('is-done');
 const dateDoneContainer = document.getElementById('date-done-container');
 
@@ -48,14 +48,11 @@ let balades = [];
 let filtreActuel = "Tout";
 let currentBaladeInDetail = null;
 let currentImageIndex = 0;
+let baladeEnCoursDeModificationId = null; // NOUVEAU : Mémoire pour savoir si on modifie ou on ajoute
 
 // --- AFFICHER/CACHER LE CALENDRIER ---
 isDoneCheckbox.addEventListener('change', (e) => {
-    if (e.target.checked) {
-        dateDoneContainer.style.display = 'block';
-    } else {
-        dateDoneContainer.style.display = 'none';
-    }
+    dateDoneContainer.style.display = e.target.checked ? 'block' : 'none';
 });
 
 // --- SYNCHRONISATION FIREBASE ---
@@ -71,7 +68,20 @@ onSnapshot(q, (snapshot) => {
     renderBalades(filtreActuel);
 });
 
-btnOpenAdd.addEventListener('click', () => modalAdd.showModal());
+// --- OUVRIR LA FENÊTRE POUR AJOUTER (Mode normal) ---
+btnOpenAdd.addEventListener('click', () => {
+    baladeEnCoursDeModificationId = null; // On remet à zéro
+    form.reset(); // On vide le formulaire
+    isDoneCheckbox.checked = false;
+    dateDoneContainer.style.display = 'none';
+    
+    // On remet les bons textes
+    document.querySelector('#modal-add h2').innerText = "Créer une nouvelle escapade";
+    document.querySelector('#form-add-listing button[type="submit"]').innerText = "Ajouter à notre carte";
+    
+    modalAdd.showModal();
+});
+
 btnCloseAdd.addEventListener('click', () => modalAdd.close());
 btnCancelAdd.addEventListener('click', (e) => { e.preventDefault(); modalAdd.close(); });
 btnCloseDetail.addEventListener('click', () => modalDetail.close());
@@ -101,7 +111,6 @@ function renderCategoriesBar() {
     });
 }
 
-// --- FORMater LA DATE (ex: 12/05/2024) ---
 function formatDateFr(dateString) {
     if(!dateString) return "";
     const date = new Date(dateString);
@@ -123,19 +132,14 @@ function renderBalades(filtre = "Tout") {
         article.className = 'listing-card';
         let vignetteImage = balade.images && balade.images.length > 0 ? balade.images[0] : 'https://api.dicebear.com/7.x/notionists/svg?seed=fallback';
         
-        // Gérer l'affichage du statut (Fait ou À planifier)
-        let statusBadge = '';
-        if (balade.isDone) {
-            statusBadge = `<span class="highlight done">Fait le ${formatDateFr(balade.dateDone)} ✅</span>`;
-        } else {
-            statusBadge = `<span class="highlight">À planifier ⏳</span>`;
-        }
+        let statusBadge = balade.isDone ? `<span class="highlight done">Fait le ${formatDateFr(balade.dateDone)} ✅</span>` : `<span class="highlight">À planifier ⏳</span>`;
 
         article.innerHTML = `
             <div class="card-image-wrapper">
                 <img src="${vignetteImage}" alt="${balade.title}" class="card-image">
                 <button class="favorite-btn"><span class="material-symbols-rounded icon-heart">favorite</span></button>
                 <button class="delete-btn" data-id="${balade.id}"><span class="material-symbols-rounded">delete</span></button>
+                <button class="edit-btn" data-id="${balade.id}"><span class="material-symbols-rounded">edit</span></button>
             </div>
             <div class="card-info">
                 <div class="card-header">
@@ -149,10 +153,11 @@ function renderBalades(filtre = "Tout") {
         `;
 
         article.addEventListener('click', (e) => {
-            const isClickingButton = e.target.closest('.favorite-btn') || e.target.closest('.delete-btn');
+            const isClickingButton = e.target.closest('.favorite-btn') || e.target.closest('.delete-btn') || e.target.closest('.edit-btn');
             if (!isClickingButton) openDetailModal(balade);
         });
 
+        // Animation Cœur
         const heartBtn = article.querySelector('.favorite-btn');
         const heartIcon = article.querySelector('.icon-heart');
         heartIcon.style.fontVariationSettings = '"FILL" 0';
@@ -162,6 +167,7 @@ function renderBalades(filtre = "Tout") {
             heartIcon.style.color = heartIcon.style.fontVariationSettings === '"FILL" 1' ? 'var(--rose-flower)' : 'var(--text-light)';
         });
 
+        // Suppression
         const deleteBtn = article.querySelector('.delete-btn');
         deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
@@ -170,8 +176,48 @@ function renderBalades(filtre = "Tout") {
             }
         });
 
+        // NOUVEAU : Modification
+        const editBtn = article.querySelector('.edit-btn');
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEditModal(balade);
+        });
+
         grid.appendChild(article);
     });
+}
+
+// --- OUVRIR LA FENÊTRE POUR MODIFIER ---
+function openEditModal(balade) {
+    baladeEnCoursDeModificationId = balade.id; // On retient quelle balade on modifie
+
+    // On change les textes de la fenêtre
+    document.querySelector('#modal-add h2').innerText = "Modifier notre aventure 💖";
+    document.querySelector('#form-add-listing button[type="submit"]').innerText = "Enregistrer les modifications";
+
+    // On pré-remplit les champs avec les infos de la balade
+    document.getElementById('title').value = balade.title;
+    document.getElementById('location').value = balade.location;
+    document.getElementById('mapsLink').value = balade.mapsLink || "";
+    document.getElementById('category-input').value = balade.category;
+    document.getElementById('budget').value = balade.budget || "Gratuit";
+    document.getElementById('duration').value = balade.duration || "";
+    document.getElementById('description').value = balade.description;
+    
+    // Remettre les images sous forme de liste avec sauts de ligne
+    document.getElementById('images-urls').value = (balade.images || []).join('\n');
+
+    // Gérer la case à cocher
+    isDoneCheckbox.checked = balade.isDone || false;
+    if (balade.isDone) {
+        dateDoneContainer.style.display = 'block';
+        document.getElementById('date-done').value = balade.dateDone || "";
+    } else {
+        dateDoneContainer.style.display = 'none';
+        document.getElementById('date-done').value = "";
+    }
+
+    modalAdd.showModal();
 }
 
 // --- GROS PLAN & GALERIE ---
@@ -213,7 +259,7 @@ btnGalleryPrev.addEventListener('click', () => { currentImageIndex = (currentIma
 
 searchBtns.forEach(btn => btn.addEventListener('click', () => alert("Pas besoin de chercher, tant qu'on est ensemble... 🥰")));
 
-// --- AJOUTER LA BALADE ---
+// --- SAUVEGARDER (AJOUT OU MODIFICATION) ---
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     let rawCat = document.getElementById('category-input').value.trim();
@@ -222,11 +268,10 @@ form.addEventListener('submit', async (e) => {
     const imagesString = document.getElementById('images-urls').value;
     const imagesArray = imagesString.split('\n').map(s => s.trim()).filter(s => s !== "");
 
-    // On récupère le statut et la date
     const isDone = isDoneCheckbox.checked;
     const dateDone = document.getElementById('date-done').value;
 
-    const newBalade = {
+    const dataBalade = {
         title: document.getElementById('title').value,
         location: document.getElementById('location').value,
         mapsLink: document.getElementById('mapsLink').value,
@@ -234,17 +279,22 @@ form.addEventListener('submit', async (e) => {
         duration: document.getElementById('duration').value,
         category: finalCategory || "Aventure", 
         description: document.getElementById('description').value,
-        createdAt: new Date().getTime(),
         images: imagesArray,
         isDone: isDone,
-        dateDone: isDone ? dateDone : null // Sauvegarde la date uniquement si "Fait"
+        dateDone: isDone ? dateDone : null
     };
     
-    await addDoc(collection(db, "balades"), newBalade);
+    // Si on a mémorisé un ID, c'est qu'on modifie ! Sinon, on ajoute.
+    if (baladeEnCoursDeModificationId) {
+        await updateDoc(doc(db, "balades", baladeEnCoursDeModificationId), dataBalade);
+    } else {
+        dataBalade.createdAt = new Date().getTime(); // Uniquement à la création
+        await addDoc(collection(db, "balades"), dataBalade);
+    }
     
     form.reset();
     isDoneCheckbox.checked = false;
-    dateDoneContainer.style.display = 'none'; // Réinitialise le calendrier
+    dateDoneContainer.style.display = 'none';
     modalAdd.close();
     
     filtreActuel = finalCategory;
