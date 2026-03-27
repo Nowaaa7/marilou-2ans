@@ -76,7 +76,6 @@
 
                     <div class="form-section">
                         <h3>Les détails croustillants</h3>
-                        
                         <div class="input-group">
                             <label for="category-input">Ambiance / Thématique</label>
                             <input type="text" id="category-input" list="category-list" placeholder="Ex: Montagne, Resto chic, Voyage..." required>
@@ -107,9 +106,10 @@
                     </div>
 
                     <div class="form-section">
-                        <h3>Une image pour me donner envie</h3>
+                        <h3>Vos photos (Une image par ligne)</h3>
                         <div class="input-group">
-                            <input type="url" id="image-url" placeholder="Colle le lien d'une image ici..." required>
+                            <label for="images-urls">Colle ici les liens de tes images (Sépare chaque lien en tapant sur la touche Entrée)</label>
+                            <textarea id="images-urls" rows="6" placeholder="https://lien-image1.jpg&#10;https://lien-image2.jpg&#10;..." required></textarea>
                         </div>
                     </div>
                 </form>
@@ -119,6 +119,43 @@
                 <button class="btn-text" id="btn-cancel">Annuler</button>
                 <button type="submit" form="form-add-listing" class="btn-primary">Ajouter à notre carte</button>
             </footer>
+        </div>
+    </dialog>
+
+    <dialog id="modal-detail" class="modal modal-large">
+        <div class="modal-container detail-container">
+            <header class="modal-header">
+                <button class="close-btn" id="btn-close-detail"><span class="material-symbols-rounded">close</span></button>
+                <h2 id="detail-title">Chargement...</h2>
+                <div></div> </header>
+            
+            <div class="modal-body detail-body">
+                <div class="gallery-wrapper">
+                    <img id="detail-main-image" src="" alt="Photo principale">
+                    <button class="gallery-nav prev" id="btn-gallery-prev">🐷</button>
+                    <button class="gallery-nav next" id="btn-gallery-next">🌹</button>
+                    <div id="gallery-counter">1 / 1</div>
+                </div>
+
+                <div class="detail-info-pane">
+                    <h3 class="card-location" style="font-size: 1.1rem;" id="detail-location">📍 Chargement...</h3>
+                    
+                    <div class="card-meta">
+                        <span id="detail-duration">⏱️ Chargement...</span>
+                        <span id="detail-budget">💰 Budget : Chargement...</span>
+                    </div>
+
+                    <p class="card-date" id="detail-category">Catégorie : Chargement...</p>
+                    
+                    <div class="detail-description-wrapper">
+                        <h3>Pourquoi on doit y aller ?</h3>
+                        <p id="detail-description" class="detail-description">Chargement...</p>
+                    </div>
+                    
+                    <div id="detail-maps-container" style="margin-top: 20px;">
+                        </div>
+                </div>
+            </div>
         </div>
     </dialog>
 
