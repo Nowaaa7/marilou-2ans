@@ -33,7 +33,7 @@ const titleDetail = document.getElementById('detail-title');
 const locationDetail = document.getElementById('detail-location');
 const durationDetail = document.getElementById('detail-duration');
 const budgetDetail = document.getElementById('detail-budget');
-const ratingDetail = document.getElementById('detail-rating'); // NOUVEAU
+const ratingDetail = document.getElementById('detail-rating'); 
 const categoryDetail = document.getElementById('detail-category');
 const descriptionDetail = document.getElementById('detail-description');
 const mapsContainerDetail = document.getElementById('detail-maps-container');
@@ -44,7 +44,7 @@ const galleryCounter = document.getElementById('gallery-counter');
 // Checkbox date et note
 const isDoneCheckbox = document.getElementById('is-done');
 const dateDoneContainer = document.getElementById('date-done-container');
-const pigRatingInput = document.getElementById('pig-rating'); // NOUVEAU
+const pigRatingInput = document.getElementById('pig-rating'); 
 
 let balades = [];
 let filtreActuel = "Tout";
@@ -52,12 +52,10 @@ let currentBaladeInDetail = null;
 let currentImageIndex = 0;
 let baladeEnCoursDeModificationId = null; 
 
-// Afficher ou cacher les options quand c'est fait
 isDoneCheckbox.addEventListener('change', (e) => {
     dateDoneContainer.style.display = e.target.checked ? 'block' : 'none';
 });
 
-// Synchro Firebase
 const baladesRef = collection(db, "balades");
 const q = query(baladesRef, orderBy("createdAt", "desc"));
 onSnapshot(q, (snapshot) => {
@@ -69,21 +67,21 @@ onSnapshot(q, (snapshot) => {
     renderBalades(filtreActuel);
 });
 
-// Ouvrir pour ajouter
+// --- L'ERREUR ÉTAIT ICI ! C'EST CORRIGÉ ---
 btnOpenAdd.addEventListener('click', () => {
     baladeEnCoursDeModificationId = null;
     form.reset();
     isDoneCheckbox.checked = false;
     dateDoneContainer.style.display = 'none';
     document.querySelector('#modal-add h2').innerText = "Créer une nouvelle escapade";
-    document.querySelector('#form-add-listing button[type="submit"]').innerText = "Ajouter à notre carte";
+    // Correction :
+    document.querySelector('button[form="form-add-listing"]').innerText = "Ajouter à notre carte";
     modalAdd.showModal();
 });
 btnCloseAdd.addEventListener('click', () => modalAdd.close());
 btnCancelAdd.addEventListener('click', (e) => { e.preventDefault(); modalAdd.close(); });
 btnCloseDetail.addEventListener('click', () => modalDetail.close());
 
-// Barre de navigation
 function renderCategoriesBar() {
     navBar.innerHTML = ''; 
     dataList.innerHTML = ''; 
@@ -114,7 +112,6 @@ function formatDateFr(dateString) {
     return date.toLocaleDateString('fr-FR');
 }
 
-// Rendu des cartes
 function renderBalades(filtre = "Tout") {
     grid.innerHTML = '';
     const baladesAffichees = filtre === "Tout" ? balades : balades.filter(b => b.category === filtre);
@@ -130,8 +127,6 @@ function renderBalades(filtre = "Tout") {
         let vignetteImage = balade.images && balade.images.length > 0 ? balade.images[0] : 'https://api.dicebear.com/7.x/notionists/svg?seed=fallback';
         
         let statusBadge = balade.isDone ? `<span class="highlight done">Fait le ${formatDateFr(balade.dateDone)} ✅</span>` : `<span class="highlight">À planifier ⏳</span>`;
-        
-        // La magie des cochons ! 
         let noteCochonHtml = balade.isDone ? "🐷".repeat(parseInt(balade.rating || 5)) : "💭 À tester";
 
         article.innerHTML = `
@@ -157,7 +152,6 @@ function renderBalades(filtre = "Tout") {
             if (!isClickingButton) openDetailModal(balade);
         });
 
-        // Animation Cœur
         const heartBtn = article.querySelector('.favorite-btn');
         const heartIcon = article.querySelector('.icon-heart');
         heartIcon.style.fontVariationSettings = '"FILL" 0';
@@ -167,7 +161,6 @@ function renderBalades(filtre = "Tout") {
             heartIcon.style.color = heartIcon.style.fontVariationSettings === '"FILL" 1' ? 'var(--rose-flower)' : 'var(--text-light)';
         });
 
-        // Suppression
         const deleteBtn = article.querySelector('.delete-btn');
         deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
@@ -176,7 +169,6 @@ function renderBalades(filtre = "Tout") {
             }
         });
 
-        // Modification
         const editBtn = article.querySelector('.edit-btn');
         editBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -187,11 +179,12 @@ function renderBalades(filtre = "Tout") {
     });
 }
 
-// Ouvrir fenêtre pour modifier
+// --- ET L'ERREUR ÉTAIT AUSSI ICI ! C'EST CORRIGÉ ---
 function openEditModal(balade) {
     baladeEnCoursDeModificationId = balade.id;
     document.querySelector('#modal-add h2').innerText = "Modifier notre aventure 💖";
-    document.querySelector('#form-add-listing button[type="submit"]').innerText = "Enregistrer les modifications";
+    // Correction :
+    document.querySelector('button[form="form-add-listing"]').innerText = "Enregistrer les modifications";
 
     document.getElementById('title').value = balade.title;
     document.getElementById('location').value = balade.location;
@@ -206,7 +199,7 @@ function openEditModal(balade) {
     if (balade.isDone) {
         dateDoneContainer.style.display = 'block';
         document.getElementById('date-done').value = balade.dateDone || "";
-        document.getElementById('pig-rating').value = balade.rating || "5"; // Charge la note enregistrée !
+        document.getElementById('pig-rating').value = balade.rating || "5"; 
     } else {
         dateDoneContainer.style.display = 'none';
         document.getElementById('date-done').value = "";
@@ -216,7 +209,6 @@ function openEditModal(balade) {
     modalAdd.showModal();
 }
 
-// Gros plan
 function openDetailModal(balade) {
     currentBaladeInDetail = balade;
     currentImageIndex = 0;
@@ -225,7 +217,6 @@ function openDetailModal(balade) {
     durationDetail.innerText = `⏱️ ${balade.duration || 'À définir'}`;
     budgetDetail.innerText = `💰 Budget : ${balade.budget || 'Non précisé'}`;
     
-    // Affiche la note cochon en gros plan
     let noteCochonHtml = balade.isDone ? "🐷".repeat(parseInt(balade.rating || 5)) : "💭 À tester";
     ratingDetail.innerText = noteCochonHtml;
 
@@ -260,7 +251,6 @@ btnGalleryPrev.addEventListener('click', () => { currentImageIndex = (currentIma
 
 searchBtns.forEach(btn => btn.addEventListener('click', () => alert("Pas besoin de chercher, tant qu'on est ensemble... 🥰")));
 
-// Sauvegarde finale vers Firebase
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     let rawCat = document.getElementById('category-input').value.trim();
@@ -271,7 +261,7 @@ form.addEventListener('submit', async (e) => {
 
     const isDone = isDoneCheckbox.checked;
     const dateDone = document.getElementById('date-done').value;
-    const ratingValue = document.getElementById('pig-rating').value; // Récupère la note
+    const ratingValue = document.getElementById('pig-rating').value; 
 
     const dataBalade = {
         title: document.getElementById('title').value,
@@ -284,7 +274,7 @@ form.addEventListener('submit', async (e) => {
         images: imagesArray,
         isDone: isDone,
         dateDone: isDone ? dateDone : null,
-        rating: isDone ? ratingValue : null // Sauvegarde la note uniquement si fait
+        rating: isDone ? ratingValue : null 
     };
     
     if (baladeEnCoursDeModificationId) {
