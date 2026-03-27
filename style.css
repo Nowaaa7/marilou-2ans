@@ -359,3 +359,50 @@ body {
 .btn-primary:hover {
     background-color: var(--rose-dark);
 }
+
+/* --- NOUVEAUX STYLES (Corbeille et Détails) --- */
+.delete-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px; /* À l'opposé du cœur ! */
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ff4d4d;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.delete-btn:hover {
+    background: #ff4d4d;
+    color: white;
+    transform: scale(1.1);
+}
+.card-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin: 10px 0;
+    font-weight: 800;
+}
+.map-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--leaf-green);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border: 1px solid var(--leaf-green);
+    padding: 5px 15px;
+    border-radius: 15px;
+    transition: 0.3s;
+}
+.map-link:hover {
+    background: var(--leaf-green);
+    color: white;
+}
