@@ -103,6 +103,18 @@
                             <label for="description">Pourquoi c'est l'endroit parfait pour nous ?</label>
                             <textarea id="description" rows="3" placeholder="J'ai vu cet endroit et ça m'a fait penser à..." required></textarea>
                         </div>
+
+                        <div class="input-group" style="background: var(--pig-pink); padding: 15px; border-radius: 12px; margin-top: 15px;">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" id="is-done" style="width: 20px; height: 20px;">
+                                <strong>✅ On a déjà fait cette escapade !</strong>
+                            </label>
+                            
+                            <div id="date-done-container" style="display: none; margin-top: 15px;">
+                                <label for="date-done">Quand y sommes-nous allés mon amour ?</label>
+                                <input type="date" id="date-done" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid white; box-sizing: border-box;">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-section">
