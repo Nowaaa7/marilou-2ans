@@ -531,3 +531,79 @@ body {
     color: white;
     transform: scale(1.1);
 }
+/* =========================================
+   RESPONSIVE DESIGN (ADAPTATION MOBILE 📱)
+   ========================================= */
+
+@media (max-width: 768px) {
+    /* 1. Le Header (En haut) */
+    .header-container {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    /* On cache la fausse barre de recherche sur mobile pour gagner de la place */
+    .search-bar {
+        display: none; 
+    }
+
+    /* Bouton d'ajout plus compact */
+    .add-listing-btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    /* 2. La Grille des balades */
+    .listings-grid {
+        grid-template-columns: 1fr; /* Une seule colonne (1 carte par ligne) */
+        padding: 0 15px;
+        gap: 20px;
+    }
+
+    /* 3. Fenêtre Modale d'Ajout */
+    .modal {
+        width: 95%; /* Prend presque tout l'écran */
+        max-height: 90vh;
+    }
+    .modal-body {
+        padding: 15px;
+    }
+    
+    /* On empile "Budget" et "Durée" l'un sous l'autre au lieu de côte à côte */
+    .form-section > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important; 
+    }
+
+    /* 4. Fenêtre Modale Gros Plan (Détails) */
+    .modal-large {
+        width: 95%;
+        height: 90vh;
+    }
+    
+    .detail-body {
+        grid-template-columns: 1fr; /* On met l'image au-dessus du texte */
+        overflow-y: auto; /* Toute la fenêtre peut défiler avec le doigt */
+        padding: 15px;
+    }
+
+    .gallery-wrapper {
+        height: 250px; /* L'image prend moins de hauteur pour laisser voir le texte */
+        flex-shrink: 0;
+        border-radius: 15px;
+    }
+
+    .detail-info-pane {
+        overflow-y: visible; /* On enlève le défilement interne */
+        padding-right: 0;
+    }
+    
+    /* Petits ajustements de texte */
+    .detail-description-wrapper {
+        padding: 12px;
+    }
+    .card-meta {
+        flex-direction: column; /* Le budget et la durée s'empilent */
+        gap: 5px;
+    }
+}
