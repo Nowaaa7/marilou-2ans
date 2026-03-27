@@ -1,4 +1,4 @@
-// --- 1. IMPORTATION DE FIREBASE (Ajout de deleteDoc et doc) ---
+// --- 1. IMPORTATION DE FIREBASE ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -22,8 +22,9 @@ const btnClose = document.getElementById('btn-close-add');
 const btnCancel = document.getElementById('btn-cancel');
 const form = document.getElementById('form-add-listing');
 const grid = document.getElementById('main-grid');
-const categoryBtns = document.querySelectorAll('.category');
 const searchBtns = document.querySelectorAll('.search-btn');
+const navBar = document.getElementById('dynamic-categories-bar');
+const dataList = document.getElementById('category-list');
 
 let balades = [];
 let filtreActuel = "Tout";
@@ -37,7 +38,8 @@ onSnapshot(q, (snapshot) => {
     snapshot.forEach((doc) => {
         balades.push({ id: doc.id, ...doc.data() });
     });
-    renderBalades(filtreActuel);
+    renderCategoriesBar(); // Met à jour le menu en haut
+    renderBalades(filtreActuel); // Affiche les balades
 });
 
 // --- 4. GESTION DE LA FENÊTRE MODALE ---
@@ -48,7 +50,46 @@ btnCancel.addEventListener('click', (e) => {
     modal.close();
 });
 
-// --- 5. AFFICHAGE DES BALADES (AVEC NOUVELLES FONCTIONS) ---
+// --- 5. GÉNÉRATION DYNAMIQUE DES CATÉGORIES ---
+function renderCategoriesBar() {
+    navBar.innerHTML = ''; // On vide la barre
+    dataList.innerHTML = ''; // On vide la liste du formulaire
+
+    // 1. On extrait toutes les catégories qui existent (sans doublons)
+    // Astuce JS : Set() permet de garder uniquement les valeurs uniques
+    const categoriesUniques = [...new Set(balades.map(b => b.category))].filter(Boolean);
+
+    // 2. On crée le bouton "Tout" qui est toujours là
+    const btnTout = document.createElement('div');
+    btnTout.className = `category ${filtreActuel === "Tout" ? "active" : ""}`;
+    btnTout.innerHTML = `<span class="material-symbols-rounded">public</span><span>Tout</span>`;
+    btnTout.addEventListener('click', () => {
+        filtreActuel = "Tout";
+        renderCategoriesBar();
+        renderBalades(filtreActuel);
+    });
+    navBar.appendChild(btnTout);
+
+    // 3. On crée un bouton pour chaque catégorie existante
+    categoriesUniques.forEach(cat => {
+        const btn = document.createElement('div');
+        btn.className = `category ${filtreActuel === cat ? "active" : ""}`;
+        btn.innerHTML = `<span class="material-symbols-rounded">label</span><span>${cat}</span>`;
+        btn.addEventListener('click', () => {
+            filtreActuel = cat;
+            renderCategoriesBar(); // Met à jour l'apparence active
+            renderBalades(filtreActuel);
+        });
+        navBar.appendChild(btn);
+
+        // On l'ajoute aussi dans la liste déroulante du formulaire !
+        const option = document.createElement('option');
+        option.value = cat;
+        dataList.appendChild(option);
+    });
+}
+
+// --- 6. AFFICHAGE DES BALADES ---
 function renderBalades(filtre = "Tout") {
     grid.innerHTML = '';
     
@@ -57,7 +98,7 @@ function renderBalades(filtre = "Tout") {
         : balades.filter(b => b.category === filtre);
 
     if (baladesAffichees.length === 0) {
-        grid.innerHTML = `<p style="text-align:center; width: 100%; grid-column: 1 / -1; color: var(--rose-flower); font-size: 1.2rem; font-weight: bold;">Notre carte aux trésors est vide ! Clique sur "Mettre mon grain de sel" pour ajouter notre première aventure ! 🌹🐷</p>`;
+        grid.innerHTML = `<p style="text-align:center; width: 100%; grid-column: 1 / -1; color: var(--rose-flower); font-size: 1.2rem; font-weight: bold;">Aucune aventure ici pour l'instant ! 🌹🐷</p>`;
         return;
     }
 
@@ -65,7 +106,6 @@ function renderBalades(filtre = "Tout") {
         const article = document.createElement('article');
         article.className = 'listing-card';
         
-        // On construit la carte avec les nouvelles infos (budget, durée, maps)
         let mapsHTML = balade.mapsLink ? `<a href="${balade.mapsLink}" target="_blank" class="map-link">📍 Itinéraire Maps</a>` : '';
         
         article.innerHTML = `
@@ -86,7 +126,7 @@ function renderBalades(filtre = "Tout") {
                     <span>💰 Budget : ${balade.budget || 'Non précisé'}</span>
                 </div>
 
-                <p class="card-date">Ambiance : ${balade.category}</p>
+                <p class="card-date">Catégorie : ${balade.category}</p>
                 <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px; line-height: 1.4;">
                     ${balade.description}
                 </p>
@@ -109,13 +149,17 @@ function renderBalades(filtre = "Tout") {
             }
         });
 
-        // 🔥 SUPPRESSION FIREBASE 🔥
+        // Suppression
         const deleteBtn = article.querySelector('.delete-btn');
         deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            // Demande de confirmation
             if(confirm("Es-tu sûr(e) de vouloir supprimer cette idée de balade ? 🥺🐷")) {
                 await deleteDoc(doc(db, "balades", balade.id));
+                // Si on supprime la dernière balade d'une catégorie, on repasse sur "Tout"
+                const categorieExisteEncore = balades.some(b => b.category === filtreActuel && b.id !== balade.id);
+                if (!categorieExisteEncore && filtreActuel !== "Tout") {
+                    filtreActuel = "Tout";
+                }
             }
         });
 
@@ -123,32 +167,19 @@ function renderBalades(filtre = "Tout") {
     });
 }
 
-// --- 6. INTERACTIVITÉ DES CATÉGORIES ---
-categoryBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        categoryBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        filtreActuel = btn.querySelector('span:nth-child(2)').innerText;
-        if(filtreActuel === "Nature") filtreActuel = "Tout"; 
-        renderBalades(filtreActuel);
-    });
-});
-
+// Petits boutons mignons
 searchBtns.forEach(btn => {
     btn.addEventListener('click', () => alert("Pas besoin de chercher, tant qu'on est ensemble, la destination n'a pas d'importance. 🥰"));
 });
 
-// --- 7. ENVOYER LA BALADE (AVEC LES NOUVEAUX PARAMÈTRES) ---
+// --- 7. ENVOYER LA BALADE ---
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const selectCat = document.getElementById('category');
-    let finalCategory = "Nature";
-    if(selectCat.value === "food") finalCategory = "Restos";
-    if(selectCat.value === "chill") finalCategory = "Bord de mer";
-    if(selectCat.value === "adventure") finalCategory = "Nocturne";
+    // On récupère le texte tapé OU choisi dans la liste, et on met une majuscule au début
+    let rawCat = document.getElementById('category-input').value.trim();
+    let finalCategory = rawCat.charAt(0).toUpperCase() + rawCat.slice(1);
 
-    // On récupère toutes les nouvelles valeurs
     const newBalade = {
         title: document.getElementById('title').value,
         location: document.getElementById('location').value,
@@ -156,7 +187,7 @@ form.addEventListener('submit', async (e) => {
         budget: document.getElementById('budget').value,
         duration: document.getElementById('duration').value,
         image: document.getElementById('image-url').value,
-        category: finalCategory,
+        category: finalCategory || "Aventure", // Par défaut si vide
         description: document.getElementById('description').value,
         status: "À planifier",
         createdAt: new Date().getTime()
@@ -167,7 +198,6 @@ form.addEventListener('submit', async (e) => {
     form.reset();
     modal.close();
     
-    categoryBtns.forEach(b => b.classList.remove('active'));
-    categoryBtns[0].classList.add('active');
-    filtreActuel = "Tout";
+    filtreActuel = finalCategory; // On affiche directement la catégorie qu'on vient de créer !
+    renderCategoriesBar();
 });
