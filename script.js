@@ -14,6 +14,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// 👇👇👇 METS TA CLÉ IMGBB JUSTE ICI 👇👇👇
+const IMGBB_API_KEY = "51d07ada1bff4b2ab75f94d3e09f86a4";
+
 const modalAdd = document.getElementById('modal-add');
 const btnOpenAdd = document.getElementById('btn-open-add');
 const btnCloseAdd = document.getElementById('btn-close-add');
@@ -50,6 +53,7 @@ let filtreActuel = "Tout";
 let currentBaladeInDetail = null;
 let currentImageIndex = 0;
 let baladeEnCoursDeModificationId = null; 
+let imagesExistantes = []; 
 
 isDoneCheckbox.addEventListener('change', (e) => {
     dateDoneContainer.style.display = e.target.checked ? 'block' : 'none';
@@ -64,7 +68,6 @@ onSnapshot(q, (snapshot) => {
         balades.push({ id: doc.id, ...doc.data() });
     });
     
-    // Tri auto
     balades.sort((a, b) => {
         let dateA = a.isDone && a.dateDone ? new Date(a.dateDone).getTime() : a.createdAt;
         let dateB = b.isDone && b.dateDone ? new Date(b.dateDone).getTime() : b.createdAt;
@@ -141,38 +144,31 @@ function renderCalendar() {
             dayDiv.className = 'calendar-day';
 
             const dateStr = `${year}-${month}-${String(d).padStart(2, '0')}`;
-            
-            // --- MODIFICATION : ON RÉCUPÈRE TOUTES LES ESCAPADES DU JOUR ---
             const escapadesDeCeJour = grouped[monthKey].filter(b => b.dateDone === dateStr);
 
             if(escapadesDeCeJour.length > 0) {
                 dayDiv.classList.add('has-event');
                 
-                // On divise la case s'il y a plusieurs photos
                 let imgHtml = `<div style="display: flex; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">`;
                 escapadesDeCeJour.forEach((esc, index) => {
                     let imgSrc = esc.images && esc.images.length > 0 ? esc.images[0] : 'https://api.dicebear.com/7.x/notionists/svg?seed=fallback';
-                    // Sépare les images par une petite ligne blanche
                     let borderStyle = index < escapadesDeCeJour.length - 1 ? 'border-right: 2px solid white;' : '';
                     imgHtml += `<img src="${imgSrc}" style="flex: 1; object-fit: cover; height: 100%; min-width: 0; ${borderStyle}">`;
                 });
                 imgHtml += `</div>`;
                 
-                // Le chiffre passe par dessus
                 dayDiv.innerHTML = `${imgHtml}<span style="position: relative; z-index: 1;">${d}</span>`;
                 
                 dayDiv.addEventListener('click', () => {
                     if (escapadesDeCeJour.length === 1) {
-                        // S'il n'y en a qu'une, on l'ouvre en grand direct
                         openDetailModal(escapadesDeCeJour[0]);
                     } else {
-                        // S'il y en a plusieurs, on bascule sur la grille pour cette date !
                         isCalendarMode = false;
                         calendarView.style.display = 'none';
                         grid.style.display = 'grid';
                         navBar.style.display = 'flex';
                         btnCalendar.innerText = "📅 Calendrier";
-                        renderBalades("Tout", dateStr); // On lance le filtre par date
+                        renderBalades("Tout", dateStr); 
                     }
                 });
             } else {
@@ -189,7 +185,9 @@ function renderCalendar() {
 
 btnOpenAdd.addEventListener('click', () => {
     baladeEnCoursDeModificationId = null;
+    imagesExistantes = []; 
     form.reset();
+    document.getElementById('image-upload').value = ""; 
     isDoneCheckbox.checked = false;
     dateDoneContainer.style.display = 'none';
     document.querySelector('#modal-add h2').innerText = "Créer une nouvelle escapade";
@@ -230,17 +228,13 @@ function formatDateFr(dateString) {
     return date.toLocaleDateString('fr-FR');
 }
 
-// --- MODIFICATION DU RENDU POUR GÉRER LE FILTRE PAR DATE ---
 function renderBalades(filtre = "Tout", dateExacte = null) {
     grid.innerHTML = '';
     
     let baladesAffichees = balades;
     
-    // Si on a demandé une date précise (depuis le calendrier)
     if (dateExacte) {
         baladesAffichees = balades.filter(b => b.dateDone === dateExacte);
-        
-        // On affiche un joli titre au-dessus des cartes
         grid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; margin-bottom: 20px;">
                 <h3 style="color: var(--rose-flower); font-size: 1.5rem;">Nos aventures du ${formatDateFr(dateExacte)} 💖</h3>
@@ -248,7 +242,6 @@ function renderBalades(filtre = "Tout", dateExacte = null) {
             </div>
         `;
     } 
-    // Sinon on utilise le filtre normal (Tout, Resto, etc.)
     else if (filtre !== "Tout") {
         baladesAffichees = balades.filter(b => b.category === filtre);
     }
@@ -315,7 +308,6 @@ function renderBalades(filtre = "Tout", dateExacte = null) {
         grid.appendChild(article);
     });
 
-    // On active le bouton de retour si on est en mode "Date Précise"
     if (dateExacte) {
         document.getElementById('btn-clear-date').addEventListener('click', () => {
             renderBalades(filtreActuel);
@@ -325,6 +317,9 @@ function renderBalades(filtre = "Tout", dateExacte = null) {
 
 function openEditModal(balade) {
     baladeEnCoursDeModificationId = balade.id;
+    imagesExistantes = balade.images || []; 
+    document.getElementById('image-upload').value = ""; 
+
     document.querySelector('#modal-add h2').innerText = "Modifier notre aventure 💖";
     document.querySelector('button[form="form-add-listing"]').innerText = "Enregistrer les modifications";
 
@@ -335,7 +330,6 @@ function openEditModal(balade) {
     document.getElementById('budget').value = balade.budget || "Gratuit";
     document.getElementById('duration').value = balade.duration || "";
     document.getElementById('description').value = balade.description;
-    document.getElementById('images-urls').value = (balade.images || []).join('\n');
 
     isDoneCheckbox.checked = balade.isDone || false;
     if (balade.isDone) {
@@ -393,47 +387,89 @@ btnGalleryPrev.addEventListener('click', () => { currentImageIndex = (currentIma
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    let rawCat = document.getElementById('category-input').value.trim();
-    let finalCategory = rawCat.charAt(0).toUpperCase() + rawCat.slice(1);
+    
+    const submitBtn = document.querySelector('button[form="form-add-listing"]');
+    const originalText = submitBtn.innerText;
+    
+    submitBtn.innerText = "Envoi des photos en cours... ⏳";
+    submitBtn.disabled = true;
+    
+    try {
+        let rawCat = document.getElementById('category-input').value.trim();
+        let finalCategory = rawCat.charAt(0).toUpperCase() + rawCat.slice(1);
 
-    const imagesString = document.getElementById('images-urls').value;
-    const imagesArray = imagesString.split('\n').map(s => s.trim()).filter(s => s !== "");
+        const isDone = isDoneCheckbox.checked;
+        const dateDone = document.getElementById('date-done').value;
+        const ratingValue = document.getElementById('pig-rating').value; 
 
-    const isDone = isDoneCheckbox.checked;
-    const dateDone = document.getElementById('date-done').value;
-    const ratingValue = document.getElementById('pig-rating').value; 
+        // --- ENVOI DES IMAGES VERS IMGBB (100% GRATUIT) ---
+        const fileInput = document.getElementById('image-upload');
+        const files = fileInput.files;
+        let newImagesArray = [];
 
-    const dataBalade = {
-        title: document.getElementById('title').value,
-        location: document.getElementById('location').value,
-        mapsLink: document.getElementById('mapsLink').value,
-        budget: document.getElementById('budget').value,
-        duration: document.getElementById('duration').value,
-        category: finalCategory || "Aventure", 
-        description: document.getElementById('description').value,
-        images: imagesArray,
-        isDone: isDone,
-        dateDone: isDone ? dateDone : null,
-        rating: isDone ? ratingValue : null 
-    };
-    
-    if (baladeEnCoursDeModificationId) {
-        await updateDoc(doc(db, "balades", baladeEnCoursDeModificationId), dataBalade);
-    } else {
-        dataBalade.createdAt = new Date().getTime();
-        await addDoc(collection(db, "balades"), dataBalade);
-    }
-    
-    form.reset();
-    isDoneCheckbox.checked = false;
-    dateDoneContainer.style.display = 'none';
-    modalAdd.close();
-    
-    filtreActuel = finalCategory;
-    
-    if(isCalendarMode) renderCalendar(); 
-    else {
-        renderCategoriesBar();
-        renderBalades(filtreActuel);
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const formData = new FormData();
+                formData.append("image", file);
+
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    newImagesArray.push(data.data.url); // On récupère le lien magique
+                } else {
+                    alert("Oups, une image n'a pas pu s'envoyer !");
+                }
+            }
+        } else {
+            newImagesArray = imagesExistantes;
+        }
+
+        const dataBalade = {
+            title: document.getElementById('title').value,
+            location: document.getElementById('location').value,
+            mapsLink: document.getElementById('mapsLink').value,
+            budget: document.getElementById('budget').value,
+            duration: document.getElementById('duration').value,
+            category: finalCategory || "Aventure", 
+            description: document.getElementById('description').value,
+            images: newImagesArray, 
+            isDone: isDone,
+            dateDone: isDone ? dateDone : null,
+            rating: isDone ? ratingValue : null 
+        };
+        
+        if (baladeEnCoursDeModificationId) {
+            await updateDoc(doc(db, "balades", baladeEnCoursDeModificationId), dataBalade);
+        } else {
+            dataBalade.createdAt = new Date().getTime();
+            await addDoc(collection(db, "balades"), dataBalade);
+        }
+        
+        form.reset();
+        document.getElementById('image-upload').value = "";
+        isDoneCheckbox.checked = false;
+        dateDoneContainer.style.display = 'none';
+        modalAdd.close();
+        
+        filtreActuel = finalCategory;
+        
+        if(isCalendarMode) renderCalendar(); 
+        else {
+            renderCategoriesBar();
+            renderBalades(filtreActuel);
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Erreur lors de l'envoi de la balade !");
+    } finally {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
     }
 });
