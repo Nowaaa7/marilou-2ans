@@ -23,7 +23,6 @@ const grid = document.getElementById('main-grid');
 const navBar = document.getElementById('dynamic-categories-bar');
 const dataList = document.getElementById('category-list');
 
-const btnSurprise = document.getElementById('btn-surprise');
 const btnCalendar = document.getElementById('btn-calendar');
 const calendarView = document.getElementById('calendar-view');
 let isCalendarMode = false;
@@ -109,7 +108,6 @@ function renderCalendar() {
         return;
     }
 
-    // Regrouper par Mois et Année (Ex: "2024-05")
     const grouped = {};
     doneBalades.forEach(b => {
         const d = new Date(b.dateDone);
@@ -118,32 +116,31 @@ function renderCalendar() {
         grouped[key].push(b);
     });
 
-    // Trier les mois du plus récent au plus ancien
     const months = Object.keys(grouped).sort((a,b) => b.localeCompare(a));
 
     months.forEach(monthKey => {
         const [year, month] = monthKey.split('-');
+        
+        // LA CORRECTION EST ICI :
         const monthName = new Date(year, month-1, 1).toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'});
 
         const monthSection = document.createElement('div');
         monthSection.className = 'calendar-month';
-        monthSection.innerHTML = `<h3>${monthName} ${year}</h3>`;
+        // Plus de doublon de l'année !
+        monthSection.innerHTML = `<h3>${monthName}</h3>`;
 
         const gridDiv = document.createElement('div');
         gridDiv.className = 'calendar-grid';
 
-        // Trouver quel jour de la semaine commence le mois (0 = Dimanche, 1 = Lundi...)
         const firstDay = new Date(year, month-1, 1).getDay();
-        const blanks = firstDay === 0 ? 6 : firstDay - 1; // On ajuste pour que Lundi soit le 1er jour
+        const blanks = firstDay === 0 ? 6 : firstDay - 1; 
         
-        // Cases vides avant le 1er du mois
         for(let i=0; i<blanks; i++) {
             gridDiv.appendChild(document.createElement('div')); 
         }
 
         const daysInMonth = new Date(year, month, 0).getDate();
         
-        // Créer tous les jours du mois
         for(let d=1; d<=daysInMonth; d++) {
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day';
@@ -167,17 +164,6 @@ function renderCalendar() {
         calendarView.appendChild(monthSection);
     });
 }
-
-btnSurprise.addEventListener('click', () => {
-    const escapadesAPlanifier = balades.filter(b => !b.isDone);
-    if (escapadesAPlanifier.length === 0) {
-        alert("Vous avez déjà tout fait ! Il est temps d'ajouter de nouvelles idées d'escapades ! 🥰");
-        return;
-    }
-    const indexAleatoire = Math.floor(Math.random() * escapadesAPlanifier.length);
-    alert("Je lance les dés... 🎲 Prépare tes affaires, on part ici !");
-    openDetailModal(escapadesAPlanifier[indexAleatoire]);
-});
 
 btnOpenAdd.addEventListener('click', () => {
     baladeEnCoursDeModificationId = null;
@@ -397,7 +383,6 @@ form.addEventListener('submit', async (e) => {
     
     filtreActuel = finalCategory;
     
-    // Si on était sur le calendrier, on le rafraîchit
     if(isCalendarMode) renderCalendar(); 
     else {
         renderCategoriesBar();
