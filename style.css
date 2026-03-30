@@ -531,6 +531,83 @@ body {
     color: white;
     transform: scale(1.1);
 }
+/* --- LE CALENDRIER FAÇON BEREAL --- */
+.calendar-container {
+    padding: 20px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.calendar-month {
+    margin-bottom: 40px;
+}
+
+.calendar-month h3 {
+    color: var(--rose-flower);
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-transform: capitalize;
+    border-bottom: 2px solid var(--pig-pink);
+    padding-bottom: 10px;
+}
+
+/* On crée la grille des 7 jours de la semaine */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-day {
+    aspect-ratio: 1; /* Reste toujours carré ! */
+    background: #f0f0f0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #ccc;
+    transition: transform 0.2s;
+}
+
+/* S'il y a une photo ce jour-là */
+.calendar-day.has-event {
+    cursor: pointer;
+    color: white;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.calendar-day.has-event:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.calendar-day img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.calendar-day span {
+    position: relative;
+    z-index: 1; /* Le numéro du jour passe au-dessus de la photo */
+}
+
+/* Sur mobile, on affiche la barre de recherche (pour le bouton calendrier) et on adapte la taille */
+@media (max-width: 768px) {
+    .hidden-mobile { display: flex !important; width: 100%; margin-top: 10px; }
+    .calendar-container { padding: 10px; }
+    .calendar-grid { gap: 5px; }
+    .calendar-day { font-size: 0.9rem; border-radius: 8px; }
+}
 /* =========================================
    RESPONSIVE DESIGN (ADAPTATION MOBILE 📱)
    ========================================= */
