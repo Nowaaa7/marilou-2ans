@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nos Escapades | Joyeux 2 Ans</title>
+    
+    <link rel="icon" type="image/jpeg" href="photo_profil.jpg">
+    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,14 +22,18 @@
                 <span class="logo-text">NosEscapades</span>
             </div>
             
-            <div class="search-bar">
+            <div class="search-bar hidden-mobile">
                 <button class="search-btn">Où aller ?</button>
                 <span class="divider"></span>
-                <button class="search-btn">Quand ?</button>
+                <button class="search-btn" id="btn-calendar" style="color: var(--rose-flower); font-weight: bold;">📅 Calendrier</button>
                 <span class="divider"></span>
-                <button class="search-btn search-btn-primary">
+                <button class="search-btn search-btn-primary" id="btn-surprise-mobile">
                     <span class="material-symbols-rounded">search</span>
                 </button>
+            </div>
+
+            <div class="surprise-bar" id="btn-surprise">
+                <span>🎲 Surprends-moi !</span>
             </div>
 
             <div class="user-actions">
@@ -42,6 +49,8 @@
     </header>
 
     <nav class="categories-bar" id="dynamic-categories-bar"></nav>
+
+    <div id="calendar-view" class="calendar-container" style="display: none;"></div>
 
     <main class="listings-grid" id="main-grid"></main>
 
@@ -134,7 +143,7 @@
             
             <footer class="modal-footer">
                 <button class="btn-text" id="btn-cancel">Annuler</button>
-                <button type="submit" form="form-add-listing" class="btn-primary">Ajouter à notre carte</button>
+                <button type="submit" form="form-add-listing">Ajouter à notre carte</button>
             </footer>
         </div>
     </dialog>
@@ -161,7 +170,8 @@
                     <div class="card-meta">
                         <span id="detail-duration">⏱️ Chargement...</span>
                         <span id="detail-budget">💰 Chargement...</span>
-                        <span id="detail-rating">🐷 Chargement...</span> </div>
+                        <span id="detail-rating">🐷 Chargement...</span>
+                    </div>
 
                     <p class="card-date" id="detail-category">Catégorie : Chargement...</p>
                     
@@ -176,6 +186,9 @@
         </div>
     </dialog>
 
+    <script type="module" src="script.js"></script>
+</body>
+</html>
     <script type="module" src="script.js"></script>
 </body>
 </html>
