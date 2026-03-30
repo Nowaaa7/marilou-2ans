@@ -64,11 +64,11 @@ onSnapshot(q, (snapshot) => {
         balades.push({ id: doc.id, ...doc.data() });
     });
     
-    // --- TRI AUTOMATIQUE PAR DATE ---
+    // Tri auto
     balades.sort((a, b) => {
         let dateA = a.isDone && a.dateDone ? new Date(a.dateDone).getTime() : a.createdAt;
         let dateB = b.isDone && b.dateDone ? new Date(b.dateDone).getTime() : b.createdAt;
-        return dateB - dateA; // Les plus récents en premier !
+        return dateB - dateA; 
     });
 
     renderCategoriesBar();
@@ -80,7 +80,6 @@ onSnapshot(q, (snapshot) => {
     }
 });
 
-// --- LE BOUTON CALENDRIER ---
 btnCalendar.addEventListener('click', () => {
     isCalendarMode = !isCalendarMode;
     if(isCalendarMode) {
@@ -98,10 +97,9 @@ btnCalendar.addEventListener('click', () => {
     }
 });
 
-// --- LE GÉNÉRATEUR DE CALENDRIER FAÇON BEREAL ---
 function renderCalendar() {
     calendarView.innerHTML = '';
-    const doneBalades = balades.filter(b => b.isDone && b.dateDone); // On prend que celles faites et datées
+    const doneBalades = balades.filter(b => b.isDone && b.dateDone); 
     
     if(doneBalades.length === 0) {
         calendarView.innerHTML = '<p style="text-align:center; font-size: 1.2rem; font-weight: bold; color: var(--rose-flower); margin-top: 50px;">Aucun souvenir daté pour le moment ! Coche "Déjà fait" sur une escapade pour la voir apparaître ici. 📸</p>';
@@ -120,13 +118,10 @@ function renderCalendar() {
 
     months.forEach(monthKey => {
         const [year, month] = monthKey.split('-');
-        
-        // LA CORRECTION EST ICI :
         const monthName = new Date(year, month-1, 1).toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'});
 
         const monthSection = document.createElement('div');
         monthSection.className = 'calendar-month';
-        // Plus de doublon de l'année !
         monthSection.innerHTML = `<h3>${monthName}</h3>`;
 
         const gridDiv = document.createElement('div');
@@ -146,13 +141,40 @@ function renderCalendar() {
             dayDiv.className = 'calendar-day';
 
             const dateStr = `${year}-${month}-${String(d).padStart(2, '0')}`;
-            const escapade = grouped[monthKey].find(b => b.dateDone === dateStr);
+            
+            // --- MODIFICATION : ON RÉCUPÈRE TOUTES LES ESCAPADES DU JOUR ---
+            const escapadesDeCeJour = grouped[monthKey].filter(b => b.dateDone === dateStr);
 
-            if(escapade) {
+            if(escapadesDeCeJour.length > 0) {
                 dayDiv.classList.add('has-event');
-                let imgHtml = escapade.images && escapade.images.length > 0 ? `<img src="${escapade.images[0]}" alt="souvenir">` : '';
-                dayDiv.innerHTML = `${imgHtml}<span>${d}</span>`;
-                dayDiv.addEventListener('click', () => openDetailModal(escapade));
+                
+                // On divise la case s'il y a plusieurs photos
+                let imgHtml = `<div style="display: flex; width: 100%; height: 100%; position: absolute; top: 0; left: 0;">`;
+                escapadesDeCeJour.forEach((esc, index) => {
+                    let imgSrc = esc.images && esc.images.length > 0 ? esc.images[0] : 'https://api.dicebear.com/7.x/notionists/svg?seed=fallback';
+                    // Sépare les images par une petite ligne blanche
+                    let borderStyle = index < escapadesDeCeJour.length - 1 ? 'border-right: 2px solid white;' : '';
+                    imgHtml += `<img src="${imgSrc}" style="flex: 1; object-fit: cover; height: 100%; min-width: 0; ${borderStyle}">`;
+                });
+                imgHtml += `</div>`;
+                
+                // Le chiffre passe par dessus
+                dayDiv.innerHTML = `${imgHtml}<span style="position: relative; z-index: 1;">${d}</span>`;
+                
+                dayDiv.addEventListener('click', () => {
+                    if (escapadesDeCeJour.length === 1) {
+                        // S'il n'y en a qu'une, on l'ouvre en grand direct
+                        openDetailModal(escapadesDeCeJour[0]);
+                    } else {
+                        // S'il y en a plusieurs, on bascule sur la grille pour cette date !
+                        isCalendarMode = false;
+                        calendarView.style.display = 'none';
+                        grid.style.display = 'grid';
+                        navBar.style.display = 'flex';
+                        btnCalendar.innerText = "📅 Calendrier";
+                        renderBalades("Tout", dateStr); // On lance le filtre par date
+                    }
+                });
             } else {
                 dayDiv.innerHTML = `<span>${d}</span>`;
             }
@@ -208,12 +230,31 @@ function formatDateFr(dateString) {
     return date.toLocaleDateString('fr-FR');
 }
 
-function renderBalades(filtre = "Tout") {
+// --- MODIFICATION DU RENDU POUR GÉRER LE FILTRE PAR DATE ---
+function renderBalades(filtre = "Tout", dateExacte = null) {
     grid.innerHTML = '';
-    const baladesAffichees = filtre === "Tout" ? balades : balades.filter(b => b.category === filtre);
+    
+    let baladesAffichees = balades;
+    
+    // Si on a demandé une date précise (depuis le calendrier)
+    if (dateExacte) {
+        baladesAffichees = balades.filter(b => b.dateDone === dateExacte);
+        
+        // On affiche un joli titre au-dessus des cartes
+        grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; margin-bottom: 20px;">
+                <h3 style="color: var(--rose-flower); font-size: 1.5rem;">Nos aventures du ${formatDateFr(dateExacte)} 💖</h3>
+                <button id="btn-clear-date" style="margin-top: 15px; padding: 10px 20px; background: var(--pig-pink); color: var(--rose-flower); font-weight: bold; border: none; border-radius: 20px; cursor: pointer;">Retour à toutes les aventures</button>
+            </div>
+        `;
+    } 
+    // Sinon on utilise le filtre normal (Tout, Resto, etc.)
+    else if (filtre !== "Tout") {
+        baladesAffichees = balades.filter(b => b.category === filtre);
+    }
 
-    if (baladesAffichees.length === 0) {
-        grid.innerHTML = `<p style="text-align:center; width: 100%; grid-column: 1 / -1; color: var(--rose-flower); font-size: 1.2rem; font-weight: bold;">Aucune aventure ici pour l'instant ! 🌹🐷</p>`;
+    if (baladesAffichees.length === 0 && !dateExacte) {
+        grid.innerHTML += `<p style="text-align:center; width: 100%; grid-column: 1 / -1; color: var(--rose-flower); font-size: 1.2rem; font-weight: bold;">Aucune aventure ici pour l'instant ! 🌹🐷</p>`;
         return;
     }
 
@@ -273,6 +314,13 @@ function renderBalades(filtre = "Tout") {
 
         grid.appendChild(article);
     });
+
+    // On active le bouton de retour si on est en mode "Date Précise"
+    if (dateExacte) {
+        document.getElementById('btn-clear-date').addEventListener('click', () => {
+            renderBalades(filtreActuel);
+        });
+    }
 }
 
 function openEditModal(balade) {
@@ -386,6 +434,9 @@ form.addEventListener('submit', async (e) => {
     if(isCalendarMode) renderCalendar(); 
     else {
         renderCategoriesBar();
+        renderBalades(filtreActuel);
+    }
+});
         renderBalades(filtreActuel);
     }
 });
