@@ -14,8 +14,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 👇👇👇 METS TA CLÉ IMGBB JUSTE ICI 👇👇👇
-const IMGBB_API_KEY = "51d07ada1bff4b2ab75f94d3e09f86a4";
+// COLLE TA CLÉ IMGBB ICI 👇
+const IMGBB_API_KEY = "COLLE_TA_CLE_IMGBB_ICI";
 
 const modalAdd = document.getElementById('modal-add');
 const btnOpenAdd = document.getElementById('btn-open-add');
@@ -29,6 +29,10 @@ const dataList = document.getElementById('category-list');
 const btnCalendar = document.getElementById('btn-calendar');
 const calendarView = document.getElementById('calendar-view');
 let isCalendarMode = false;
+
+// NOUVEAU : LA CARTE MONDIALE
+let map;
+let markerGroup; // Pour pouvoir vider et re-remplir la carte proprement
 
 const modalDetail = document.getElementById('modal-detail');
 const btnCloseDetail = document.getElementById('btn-close-detail');
@@ -55,6 +59,47 @@ let currentImageIndex = 0;
 let baladeEnCoursDeModificationId = null; 
 let imagesExistantes = []; 
 
+// --- INITIALISATION DE LA CARTE ---
+function initMap() {
+    // Crée la carte centrée sur l'Europe par défaut
+    map = L.map('escapade-map').setView([48.85, 2.35], 5);
+    
+    // Ajoute le fond de carte "OpenStreetMap" (Gratuit !)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Crée un groupe pour ranger les ronds photos
+    markerGroup = L.layerGroup().addTo(map);
+}
+
+// Lancement de la carte au chargement de la page
+initMap();
+
+// --- AJOUTER LES COPAINS SUR LA CARTE ---
+function populateMap() {
+    // On vide l'ancienne carte avant
+    markerGroup.clearLayers();
+    
+    // On prend toutes les balades qui ont des coordonnées
+    const currentEscapades = balades.filter(b => b.lat && b.lng);
+
+    currentEscapades.forEach(balade => {
+        // Crée une icône personnalisée avec la photo
+        const photoIcon = L.divIcon({
+            className: 'custom-photo-marker', // On utilise le style du CSS
+            html: `<img src="${balade.images[0]}" class="photo-marker">`, // Première photo
+            iconSize: [40, 40], // Taille du rond
+            iconAnchor: [20, 40] // Centrage
+        });
+
+        // Crée le marqueur (le copain) et l'ajoute au groupe
+        L.marker([balade.lat, balade.lng], {icon: photoIcon})
+         .addTo(markerGroup)
+         .addEventListener('click', () => openDetailModal(balade)); // Clique dessus = ouvre en grand
+    });
+}
+
 isDoneCheckbox.addEventListener('change', (e) => {
     dateDoneContainer.style.display = e.target.checked ? 'block' : 'none';
 });
@@ -75,6 +120,9 @@ onSnapshot(q, (snapshot) => {
     });
 
     renderCategoriesBar();
+    
+    // Remplit la carte mondiale à chaque mise à jour des données
+    populateMap();
     
     if(isCalendarMode) {
         renderCalendar();
@@ -325,6 +373,9 @@ function openEditModal(balade) {
 
     document.getElementById('title').value = balade.title;
     document.getElementById('location').value = balade.location;
+    // Remplir les cases Latitude et Longitude en mode modification
+    document.getElementById('lat').value = balade.lat || "";
+    document.getElementById('lng').value = balade.lng || "";
     document.getElementById('mapsLink').value = balade.mapsLink || "";
     document.getElementById('category-input').value = balade.category;
     document.getElementById('budget').value = balade.budget || "Gratuit";
@@ -402,7 +453,10 @@ form.addEventListener('submit', async (e) => {
         const dateDone = document.getElementById('date-done').value;
         const ratingValue = document.getElementById('pig-rating').value; 
 
-        // --- ENVOI DES IMAGES VERS IMGBB (100% GRATUIT) ---
+        // Récupérer Latitude et Longitude
+        const lat = parseFloat(document.getElementById('lat').value);
+        const lng = parseFloat(document.getElementById('lng').value);
+
         const fileInput = document.getElementById('image-upload');
         const files = fileInput.files;
         let newImagesArray = [];
@@ -421,9 +475,7 @@ form.addEventListener('submit', async (e) => {
                 const data = await res.json();
                 
                 if(data.success) {
-                    newImagesArray.push(data.data.url); // On récupère le lien magique
-                } else {
-                    alert("Oups, une image n'a pas pu s'envoyer !");
+                    newImagesArray.push(data.data.url); 
                 }
             }
         } else {
@@ -433,6 +485,8 @@ form.addEventListener('submit', async (e) => {
         const dataBalade = {
             title: document.getElementById('title').value,
             location: document.getElementById('location').value,
+            lat: lat || null, // Sauvegarde les coordonnées
+            lng: lng || null,
             mapsLink: document.getElementById('mapsLink').value,
             budget: document.getElementById('budget').value,
             duration: document.getElementById('duration').value,
