@@ -1,51 +1,48 @@
 /* =========================================
-   THÈME : FLEURS, ROSES & COCHONS 🌹🐷
+   VARIABLES & POLICES (Global)
    ========================================= */
-
 :root {
-    /* Palette de couleurs */
-    --rose-flower: #ff4d6d;      /* Rose rouge (Pétales) */
-    --rose-dark: #c9184a;        /* Rose foncé (Ombres des fleurs) */
-    --pig-pink: #ffb3c6;         /* Rose cochon (Doux et clair) */
-    --pig-snout: #ff8fab;        /* Rose groin (Un peu plus soutenu) */
-    --leaf-green: #90a955;       /* Vert feuille/tige */
-    --bg-cream: #fff0f3;         /* Fond crème très légèrement rosé */
-    --text-main: #4a3b3d;        /* Texte marron foncé (plus doux que le noir) */
-    --text-light: #8a7a7c;
-    
-    /* Variables de design */
-    --radius-bubbly: 30px;       /* Des bords bien ronds ! */
-    --shadow-soft: 0 8px 20px rgba(255, 143, 171, 0.2);
+    --pig-pink: #ffe0e6;   /* Rose cochon très clair */
+    --rose-flower: #ff385c; /* Rose fleur vibrant (Airbnb) */
+    --leaf-green: #228b22;  /* Vert feuille */
+    --text-dark: #222222;
+    --text-light: #717171;
+    --border-color: #dddddd;
+    --font-main: 'Nunito', sans-serif;
 }
 
 body {
-    font-family: 'Nunito', sans-serif; /* Police très arrondie et douce */
+    font-family: var(--font-main);
     margin: 0;
     padding: 0;
-    background-color: var(--bg-cream);
-    color: var(--text-main);
-    /* Un motif de fond très très subtil à pois (comme des petites fleurs/groins) */
-    background-image: radial-gradient(var(--pig-pink) 1px, transparent 1px);
-    background-size: 40px 40px;
+    color: var(--text-dark);
+    background-color: #fafafa;
 }
 
-/* --- HEADER (Barre de navigation) --- */
+button {
+    font-family: var(--font-main);
+    cursor: pointer;
+}
+
+/* =========================================
+   HEADER (Navigation du haut)
+   ========================================= */
 .main-header {
-    background-color: white;
-    border-bottom: 3px solid var(--pig-pink);
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 0;
     position: sticky;
     top: 0;
-    z-index: 100;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    z-index: 1000;
 }
 
 .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 15px 5%;
 }
 
 .logo {
@@ -55,483 +52,179 @@ body {
     color: var(--rose-flower);
     font-size: 1.4rem;
     font-weight: 800;
-}
-.logo-icon { font-size: 2rem; }
-/* La petite touche cochon et rose dans le logo ! */
-.logo-text::after {
-    content: " 🌹🐷";
-    font-size: 1.2rem;
+    cursor: pointer;
 }
 
-/* Barre de recherche "Airbnb" mais ronde comme un cochon */
+.logo-icon {
+    font-size: 2rem;
+    font-variation-settings: 'FILL' 1;
+}
+
 .search-bar {
+    border: 1px solid var(--border-color);
+    border-radius: 40px;
+    padding: 8px;
     display: flex;
     align-items: center;
-    background: white;
-    border: 2px solid var(--pig-snout);
-    border-radius: 50px;
-    padding: 5px 5px 5px 20px;
-    box-shadow: var(--shadow-soft);
-    transition: transform 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s;
 }
+
 .search-bar:hover {
-    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
+
 .search-btn {
     background: none;
     border: none;
-    font-family: inherit;
+    padding: 8px 16px;
     font-weight: 600;
-    color: var(--text-main);
-    cursor: pointer;
-    padding: 10px;
+    color: var(--text-dark);
+    font-size: 0.95rem;
 }
+
 .divider {
-    height: 25px;
-    width: 2px;
-    background-color: var(--pig-pink);
-    margin: 0 10px;
+    border-left: 1px solid var(--border-color);
+    height: 24px;
 }
+
 .search-btn-primary {
     background-color: var(--rose-flower);
     color: white;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
+    margin-left: 8px;
 }
 
-/* Actions utilisateur */
 .user-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 16px;
 }
+
 .add-listing-btn {
-    background-color: white;
-    color: var(--text-main);
-    border: 2px solid var(--leaf-green);
-    padding: 10px 20px;
-    border-radius: var(--radius-bubbly);
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
+    background: none;
+    border: none;
+    color: var(--rose-flower);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 10px 15px;
+    border-radius: 20px;
+    transition: background-color 0.2s;
 }
+
 .add-listing-btn:hover {
-    background-color: var(--leaf-green);
-    color: white;
-}
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 2px solid var(--pig-pink);
-    padding: 5px 10px;
-    border-radius: 50px;
-    background: white;
-}
-.avatar img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
     background-color: var(--pig-pink);
 }
 
-/* --- CATÉGORIES --- */
-.categories-bar {
+.user-profile {
+    border: 1px solid var(--border-color);
+    border-radius: 40px;
+    padding: 5px 5px 5px 12px;
     display: flex;
-    justify-content: center;
-    gap: 40px;
-    padding: 20px 0;
-    background: white;
-    border-bottom: 1px solid var(--bg-cream);
-    overflow-x: auto;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-light);
 }
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--text-light);
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =========================================
+   BARRE CATÉGORIES (Filtres)
+   ========================================= */
+.categories-bar {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 24px 0 24px;
+    display: flex;
+    gap: 15px;
+    overflow-x: auto; /* Défilement horizontal sur mobile */
+}
+
+/* Cacher la barre de défilement */
+.categories-bar::-webkit-scrollbar {
+    display: none;
+}
+
 .category {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 15px;
     color: var(--text-light);
+    border-bottom: 2px solid transparent;
     cursor: pointer;
-    transition: color 0.2s;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    opacity: 0.7;
 }
+
 .category:hover {
     color: var(--rose-flower);
+    opacity: 1;
 }
+
 .category.active {
     color: var(--rose-flower);
-    border-bottom: 3px solid var(--rose-flower);
-    padding-bottom: 5px;
+    border-bottom-color: var(--rose-flower);
+    opacity: 1;
 }
 
-/* --- GRILLE DES ANNONCES --- */
-.listings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-    max-width: 1400px;
-    margin: 40px auto;
-    padding: 0 5%;
+.category span.material-symbols-rounded {
+    font-size: 1.6rem;
 }
 
-.listing-card {
-    background: white;
-    border-radius: var(--radius-bubbly);
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    border: 2px solid transparent;
-    transition: all 0.3s;
-    cursor: pointer;
-}
-.listing-card:hover {
-    border-color: var(--pig-snout);
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-soft);
+.category span:not(.material-symbols-rounded) {
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
-.card-image-wrapper {
-    position: relative;
-    height: 280px;
-    overflow: hidden;
-    padding: 10px;
-}
-.card-image {
+/* =========================================
+   N'OUBLIE PAS : LE STYLE DE LA CARTE EST ICI
+   ========================================= */
+.map-world-container {
     width: 100%;
-    height: 100%;
+    height: 350px; /* Moins haut qu'avant pour laisser de la place aux cartes */
+    z-index: 500;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Style des ronds photo sur la carte */
+.photo-marker {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    border: 3px solid white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
     object-fit: cover;
-    border-radius: 20px;
-    transition: transform 0.5s ease;
-}
-.listing-card:hover .card-image {
-    transform: scale(1.05);
-}
-.favorite-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--rose-flower);
+    transition: all 0.3s ease;
     cursor: pointer;
 }
-
-.card-info { padding: 15px 20px 20px; }
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-}
-.card-title {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 800;
-}
-.card-rating {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 0.9rem;
-}
-.star { font-size: 1rem; color: var(--leaf-green); }
-.card-location, .card-date {
-    margin: 3px 0;
-    color: var(--text-light);
-    font-size: 0.95rem;
-}
-.card-status { margin-top: 10px; }
-.highlight {
-    background-color: var(--pig-pink);
-    color: var(--rose-dark);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-/* --- FENÊTRE MODALE (AJOUT) --- */
-.modal {
-    border: none;
-    border-radius: 24px;
-    padding: 0;
-    width: 90%;
-    max-width: 600px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    background-color: white;
-}
-.modal::backdrop {
-    background: rgba(255, 179, 198, 0.4); /* Backdrop teinté rose cochon ! */
-    backdrop-filter: blur(4px);
-}
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 2px solid var(--pig-pink);
-}
-.modal-header h2 { margin: 0; font-size: 1.3rem; color: var(--rose-dark); }
-.close-btn {
-    background: var(--bg-cream);
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    color: var(--rose-flower);
-}
-.modal-body {
-    padding: 20px;
-    max-height: 60vh;
-    overflow-y: auto;
-}
-.form-section h3 {
-    font-size: 1.1rem;
-    color: var(--leaf-green);
-    margin-top: 0;
-}
-.input-group { margin-bottom: 15px; }
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
-.input-group input, .input-group select, .input-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid var(--pig-pink);
-    border-radius: 12px;
-    font-family: inherit;
-    box-sizing: border-box;
-}
-.input-group input:focus, .input-group textarea:focus {
-    outline: none;
+.photo-marker:hover {
+    transform: scale(1.2) translateY(-5px);
     border-color: var(--rose-flower);
 }
-.image-upload-zone {
-    border: 2px dashed var(--pig-snout);
-    border-radius: 15px;
-    padding: 30px;
-    text-align: center;
-    background: var(--bg-cream);
-    margin-bottom: 20px;
-}
-.upload-icon {
-    font-size: 3rem;
-    color: var(--pig-snout);
-}
-.modal-footer {
-    padding: 20px;
-    border-top: 2px solid var(--pig-pink);
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-}
-.btn-text {
-    background: none;
-    border: none;
-    font-weight: bold;
-    color: var(--text-light);
-    cursor: pointer;
-}
-.btn-primary {
-    background-color: var(--rose-flower);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-primary:hover {
-    background-color: var(--rose-dark);
-}
 
-/* --- NOUVEAUX STYLES (Corbeille et Détails) --- */
-.delete-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px; /* À l'opposé du cœur ! */
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #ff4d4d;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.delete-btn:hover {
-    background: #ff4d4d;
-    color: white;
-    transform: scale(1.1);
-}
-.card-meta {
-    display: flex;
-    gap: 15px;
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin: 10px 0;
-    font-weight: 800;
-}
-.map-link {
-    display: inline-block;
-    margin-top: 15px;
-    color: var(--leaf-green);
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.9rem;
-    border: 1px solid var(--leaf-green);
-    padding: 5px 15px;
-    border-radius: 15px;
-    transition: 0.3s;
-}
-.map-link:hover {
-    background: var(--leaf-green);
-    color: white;
-}
-/* --- NOUVEAUX STYLES : GROS PLAN & GALERIE DE PHOTOS --- */
-
-/* La fenêtre modale en gros plan */
-.modal-large {
-    max-width: 1000px;
-    width: 90%;
-    height: 85vh; /* 85% de la hauteur de l'écran */
-}
-
-/* Le conteneur à l'intérieur */
-.detail-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-/* Le corps de la fenêtre de détails */
-.detail-body {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr; /* 1.5 pour l'image, 1 pour le texte */
-    gap: 25px;
-    padding: 25px;
-    max-height: none; /* Désactive la limitation de hauteur du corps par défaut */
-    overflow: hidden; /* Empêche le corps complet de scroller */
-}
-
-/* --- La Galerie d'images (Gauche) --- */
-.gallery-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 20px;
-    overflow: hidden;
-    background-color: var(--pig-pink);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#detail-main-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* L'image remplit tout l'espace sans se déformer */
-}
-
-/* Les boutons de navigation sur l'image (Fleur / Cochon) */
-.gallery-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.8);
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s;
-    z-index: 10;
-}
-.gallery-nav:hover { background: rgba(255, 255, 255, 1); }
-.gallery-nav.prev { left: 15px; }
-.gallery-nav.next { right: 15px; }
-
-/* Masque les boutons si une seule image */
-.gallery-nav.hidden { display: none; }
-
-/* Le compteur d'images (ex: 1 / 3) */
-#gallery-counter {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-/* --- Le panneau d'infos (Droite) --- */
-.detail-info-pane {
-    height: 100%;
-    overflow-y: auto; /* Seul le panneau de texte peut scroller */
-    padding-right: 10px; /* Espace pour la barre de défilement */
-}
-
-.detail-description-wrapper {
-    background-color: var(--bg-cream);
-    padding: 15px;
-    border-radius: 15px;
-    margin-top: 20px;
-}
-.detail-description-wrapper h3 { margin-top: 0; color: var(--rose-flower); }
-.detail-description { line-height: 1.6; color: var(--text-main); }
-.highlight.done {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-/* Bouton Modifier (Crayon) */
-.edit-btn {
-    position: absolute;
-    top: 20px;
-    left: 65px; /* Placé juste à côté de la corbeille ! */
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--leaf-green); /* En vert pour le différencier */
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.edit-btn:hover {
-    background: var(--leaf-green);
-    color: white;
-    transform: scale(1.1);
-}
-/* --- LE CALENDRIER FAÇON BEREAL --- */
+/* --- LE CALENDRIER --- */
 .calendar-container {
     padding: 20px 40px;
     max-width: 1200px;
@@ -551,7 +244,6 @@ body {
     padding-bottom: 10px;
 }
 
-/* On crée la grille des 7 jours de la semaine */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -559,7 +251,7 @@ body {
 }
 
 .calendar-day {
-    aspect-ratio: 1; /* Reste toujours carré ! */
+    aspect-ratio: 1; 
     background: #f0f0f0;
     border-radius: 12px;
     display: flex;
@@ -573,7 +265,6 @@ body {
     transition: transform 0.2s;
 }
 
-/* S'il y a une photo ce jour-là */
 .calendar-day.has-event {
     cursor: pointer;
     color: white;
@@ -598,89 +289,375 @@ body {
 
 .calendar-day span {
     position: relative;
-    z-index: 1; /* Le numéro du jour passe au-dessus de la photo */
+    z-index: 1;
 }
 
-/* Sur mobile, on affiche la barre de recherche (pour le bouton calendrier) et on adapte la taille */
-@media (max-width: 768px) {
-    .hidden-mobile { display: flex !important; width: 100%; margin-top: 10px; }
-    .calendar-container { padding: 10px; }
-    .calendar-grid { gap: 5px; }
-    .calendar-day { font-size: 0.9rem; border-radius: 8px; }
-}
 /* =========================================
-   RESPONSIVE DESIGN (ADAPTATION MOBILE 📱)
+   GRILLE DES BALADES (Cartes)
    ========================================= */
+.listings-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
 
+.listing-card {
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.listing-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1; /* Carte carrée */
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.favorite-btn, .delete-btn, .edit-btn {
+    position: absolute;
+    top: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: var(--text-dark);
+    transition: all 0.2s;
+}
+
+.favorite-btn:hover, .delete-btn:hover { background: var(--rose-flower); color: white; transform: scale(1.1); }
+.edit-btn:hover { background: var(--leaf-green); color: white; transform: scale(1.1); }
+
+.favorite-btn { right: 20px; }
+.icon-heart { fill: none; transition: all 0.2s; }
+
+.delete-btn { right: 65px; color: var(--rose-flower); }
+.edit-btn { right: 110px; color: var(--leaf-green); }
+
+.card-info {
+    padding: 15px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 5px;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.card-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: bold;
+}
+
+.card-location {
+    margin: 0 0 10px 0;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.card-status .highlight {
+    background-color: var(--pig-pink);
+    color: var(--rose-flower);
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.card-status .highlight.done {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.card-date {
+    margin: 0;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+/* =========================================
+   FENÊTRE MODALE (Formulaire)
+   ========================================= */
+.modal {
+    border: none;
+    border-radius: 20px;
+    padding: 0;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Modale en gros plan */
+.modal-large {
+    max-width: 900px;
+    width: 90%;
+    height: 80vh;
+}
+
+.modal::backdrop {
+    background-color: rgba(0,0,0,0.6);
+}
+
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.modal-header {
+    padding: 15px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--rose-flower);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+    padding: 0;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto; /* Défilement interne */
+    flex: 1;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: var(--rose-flower);
+    margin-bottom: 15px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.input-group input[type="text"],
+.input-group input[type="url"],
+.input-group input[type="date"],
+.input-group select,
+.input-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-sizing: border-box; /* Vital */
+    font-family: var(--font-main);
+}
+
+.input-group textarea {
+    resize: vertical;
+}
+
+.modal-footer {
+    padding: 15px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-dark);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background-color: var(--rose-flower);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+}
+.btn-primary:disabled {
+    background-color: #cccccc;
+    opacity: 0.7;
+}
+
+/*Style Gros Plan*/
+.detail-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 0; /* On enlève le padding de la modale */
+}
+
+.gallery-wrapper {
+    position: relative;
+    height: 100%;
+}
+
+#detail-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.gallery-nav.prev { left: 15px; }
+.gallery-nav.next { right: 15px; }
+.gallery-nav.hidden { display: none; }
+
+#gallery-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+#gallery-counter.hidden { display: none; }
+
+.detail-info-pane {
+    padding: 24px 24px 24px 0;
+    overflow-y: auto;
+}
+
+.card-meta {
+    display: flex;
+    gap: 15px;
+    color: var(--leaf-green);
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+#detail-category { border: none; padding: 0; margin-bottom: 20px;}
+
+.detail-description-wrapper {
+    background: #fafafa;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+}
+.detail-description-wrapper h3 { margin-top: 0; color: var(--rose-flower);}
+.detail-description { color: var(--text-dark); line-height: 1.5; margin: 0;}
+
+.map-link {
+    display: inline-block;
+    background: var(--rose-flower);
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN (Adaptation Mobile 📱)
+   ========================================= */
 @media (max-width: 768px) {
-    /* 1. Le Header (En haut) */
-    .header-container {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-    }
+    .header-container { flex-direction: column; gap: 15px; padding: 15px; }
     
-    /* On cache la fausse barre de recherche sur mobile pour gagner de la place */
-    .search-bar {
-        display: none; 
-    }
-
-    /* Bouton d'ajout plus compact */
-    .add-listing-btn {
-        padding: 8px 15px;
-        font-size: 0.9rem;
-    }
-
-    /* 2. La Grille des balades */
-    .listings-grid {
-        grid-template-columns: 1fr; /* Une seule colonne (1 carte par ligne) */
-        padding: 0 15px;
-        gap: 20px;
-    }
-
-    /* 3. Fenêtre Modale d'Ajout */
-    .modal {
-        width: 95%; /* Prend presque tout l'écran */
-        max-height: 90vh;
-    }
-    .modal-body {
-        padding: 15px;
-    }
+    .hidden-mobile { display: flex !important; width: 100%; margin-top: 10px; }
     
-    /* On empile "Budget" et "Durée" l'un sous l'autre au lieu de côte à côte */
+    .logo-text { font-size: 1.1rem;}
+
+    .search-bar { display: none; }
+
+    .add-listing-btn { padding: 8px 15px; font-size: 0.9rem; }
+
+    .map-world-container { height: 280px; } /* Moins haut sur mobile */
+
+    .listings-grid { grid-template-columns: 1fr; padding: 0 15px; gap: 20px; }
+
+    .modal { width: 95%; max-height: 90vh; }
+    .modal-body { padding: 15px; }
+    
     .form-section > div[style*="grid-template-columns"] {
         grid-template-columns: 1fr !important; 
     }
 
-    /* 4. Fenêtre Modale Gros Plan (Détails) */
-    .modal-large {
-        width: 95%;
-        height: 90vh;
-    }
+    .modal-large { width: 95%; height: 90vh; }
     
-    .detail-body {
-        grid-template-columns: 1fr; /* On met l'image au-dessus du texte */
-        overflow-y: auto; /* Toute la fenêtre peut défiler avec le doigt */
-        padding: 15px;
-    }
+    .detail-body { grid-template-columns: 1fr; overflow-y: auto; padding: 15px; }
 
-    .gallery-wrapper {
-        height: 250px; /* L'image prend moins de hauteur pour laisser voir le texte */
-        flex-shrink: 0;
-        border-radius: 15px;
-    }
+    .gallery-wrapper { height: 250px; flex-shrink: 0; border-radius: 15px; overflow: hidden;}
 
-    .detail-info-pane {
-        overflow-y: visible; /* On enlève le défilement interne */
-        padding-right: 0;
-    }
+    .detail-info-pane { overflow-y: visible; padding: 0; }
     
-    /* Petits ajustements de texte */
-    .detail-description-wrapper {
-        padding: 12px;
-    }
-    .card-meta {
-        flex-direction: column; /* Le budget et la durée s'empilent */
-        gap: 5px;
-    }
+    .card-meta { flex-direction: column; gap: 5px; }
+    
+    .calendar-container { padding: 10px; }
+    .calendar-grid { gap: 5px; }
+    .calendar-day { font-size: 0.9rem; border-radius: 8px; }
 }
