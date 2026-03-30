@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nos Escapades | Joyeux 2 Ans</title>
-    
     <link rel="icon" type="image/jpeg" href="photo_profil.jpg">
-    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,10 +126,11 @@
                     </div>
 
                     <div class="form-section">
-                        <h3>Vos photos (Une image par ligne)</h3>
+                        <h3>Vos photos 📸</h3>
                         <div class="input-group">
-                            <label for="images-urls">Colle ici les liens de tes images (Sépare chaque lien en tapant sur la touche Entrée)</label>
-                            <textarea id="images-urls" rows="6" placeholder="https://lien-image1.jpg&#10;https://lien-image2.jpg&#10;..." required></textarea>
+                            <label for="image-upload">Sélectionne tes photos depuis ton téléphone ou PC</label>
+                            <input type="file" id="image-upload" multiple accept="image/*" style="padding: 10px; background: white; border-radius: 8px; width: 100%; box-sizing: border-box;">
+                            <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 8px;">Tu peux en sélectionner plusieurs d'un coup ! Si tu laisses vide en modifiant, les anciennes seront conservées.</p>
                         </div>
                     </div>
                 </form>
