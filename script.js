@@ -437,6 +437,3 @@ form.addEventListener('submit', async (e) => {
         renderBalades(filtreActuel);
     }
 });
-        renderBalades(filtreActuel);
-    }
-});
