@@ -14,7 +14,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Éléments HTML
 const modalAdd = document.getElementById('modal-add');
 const btnOpenAdd = document.getElementById('btn-open-add');
 const btnCloseAdd = document.getElementById('btn-close-add');
@@ -23,9 +22,12 @@ const form = document.getElementById('form-add-listing');
 const grid = document.getElementById('main-grid');
 const navBar = document.getElementById('dynamic-categories-bar');
 const dataList = document.getElementById('category-list');
-const searchBtns = document.querySelectorAll('.search-btn');
 
-// Éléments Modale Détail
+const btnSurprise = document.getElementById('btn-surprise');
+const btnCalendar = document.getElementById('btn-calendar');
+const calendarView = document.getElementById('calendar-view');
+let isCalendarMode = false;
+
 const modalDetail = document.getElementById('modal-detail');
 const btnCloseDetail = document.getElementById('btn-close-detail');
 const mainImageDetail = document.getElementById('detail-main-image');
@@ -41,10 +43,8 @@ const btnGalleryPrev = document.getElementById('btn-gallery-prev');
 const btnGalleryNext = document.getElementById('btn-gallery-next');
 const galleryCounter = document.getElementById('gallery-counter');
 
-// Checkbox date et note
 const isDoneCheckbox = document.getElementById('is-done');
 const dateDoneContainer = document.getElementById('date-done-container');
-const pigRatingInput = document.getElementById('pig-rating'); 
 
 let balades = [];
 let filtreActuel = "Tout";
@@ -58,23 +58,133 @@ isDoneCheckbox.addEventListener('change', (e) => {
 
 const baladesRef = collection(db, "balades");
 const q = query(baladesRef, orderBy("createdAt", "desc"));
+
 onSnapshot(q, (snapshot) => {
     balades = [];
     snapshot.forEach((doc) => {
         balades.push({ id: doc.id, ...doc.data() });
     });
+    
+    // --- TRI AUTOMATIQUE PAR DATE ---
+    balades.sort((a, b) => {
+        let dateA = a.isDone && a.dateDone ? new Date(a.dateDone).getTime() : a.createdAt;
+        let dateB = b.isDone && b.dateDone ? new Date(b.dateDone).getTime() : b.createdAt;
+        return dateB - dateA; // Les plus récents en premier !
+    });
+
     renderCategoriesBar();
-    renderBalades(filtreActuel);
+    
+    if(isCalendarMode) {
+        renderCalendar();
+    } else {
+        renderBalades(filtreActuel);
+    }
 });
 
-// --- L'ERREUR ÉTAIT ICI ! C'EST CORRIGÉ ---
+// --- LE BOUTON CALENDRIER ---
+btnCalendar.addEventListener('click', () => {
+    isCalendarMode = !isCalendarMode;
+    if(isCalendarMode) {
+        grid.style.display = 'none';
+        navBar.style.display = 'none';
+        calendarView.style.display = 'block';
+        btnCalendar.innerText = "🗺️ Cartes";
+        renderCalendar();
+    } else {
+        grid.style.display = 'grid';
+        navBar.style.display = 'flex';
+        calendarView.style.display = 'none';
+        btnCalendar.innerText = "📅 Calendrier";
+        renderBalades(filtreActuel);
+    }
+});
+
+// --- LE GÉNÉRATEUR DE CALENDRIER FAÇON BEREAL ---
+function renderCalendar() {
+    calendarView.innerHTML = '';
+    const doneBalades = balades.filter(b => b.isDone && b.dateDone); // On prend que celles faites et datées
+    
+    if(doneBalades.length === 0) {
+        calendarView.innerHTML = '<p style="text-align:center; font-size: 1.2rem; font-weight: bold; color: var(--rose-flower); margin-top: 50px;">Aucun souvenir daté pour le moment ! Coche "Déjà fait" sur une escapade pour la voir apparaître ici. 📸</p>';
+        return;
+    }
+
+    // Regrouper par Mois et Année (Ex: "2024-05")
+    const grouped = {};
+    doneBalades.forEach(b => {
+        const d = new Date(b.dateDone);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+        if(!grouped[key]) grouped[key] = [];
+        grouped[key].push(b);
+    });
+
+    // Trier les mois du plus récent au plus ancien
+    const months = Object.keys(grouped).sort((a,b) => b.localeCompare(a));
+
+    months.forEach(monthKey => {
+        const [year, month] = monthKey.split('-');
+        const monthName = new Date(year, month-1, 1).toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'});
+
+        const monthSection = document.createElement('div');
+        monthSection.className = 'calendar-month';
+        monthSection.innerHTML = `<h3>${monthName} ${year}</h3>`;
+
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'calendar-grid';
+
+        // Trouver quel jour de la semaine commence le mois (0 = Dimanche, 1 = Lundi...)
+        const firstDay = new Date(year, month-1, 1).getDay();
+        const blanks = firstDay === 0 ? 6 : firstDay - 1; // On ajuste pour que Lundi soit le 1er jour
+        
+        // Cases vides avant le 1er du mois
+        for(let i=0; i<blanks; i++) {
+            gridDiv.appendChild(document.createElement('div')); 
+        }
+
+        const daysInMonth = new Date(year, month, 0).getDate();
+        
+        // Créer tous les jours du mois
+        for(let d=1; d<=daysInMonth; d++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day';
+
+            const dateStr = `${year}-${month}-${String(d).padStart(2, '0')}`;
+            const escapade = grouped[monthKey].find(b => b.dateDone === dateStr);
+
+            if(escapade) {
+                dayDiv.classList.add('has-event');
+                let imgHtml = escapade.images && escapade.images.length > 0 ? `<img src="${escapade.images[0]}" alt="souvenir">` : '';
+                dayDiv.innerHTML = `${imgHtml}<span>${d}</span>`;
+                dayDiv.addEventListener('click', () => openDetailModal(escapade));
+            } else {
+                dayDiv.innerHTML = `<span>${d}</span>`;
+            }
+
+            gridDiv.appendChild(dayDiv);
+        }
+
+        monthSection.appendChild(gridDiv);
+        calendarView.appendChild(monthSection);
+    });
+}
+
+btnSurprise.addEventListener('click', () => {
+    const escapadesAPlanifier = balades.filter(b => !b.isDone);
+    if (escapadesAPlanifier.length === 0) {
+        alert("Vous avez déjà tout fait ! Il est temps d'ajouter de nouvelles idées d'escapades ! 🥰");
+        return;
+    }
+    const indexAleatoire = Math.floor(Math.random() * escapadesAPlanifier.length);
+    alert("Je lance les dés... 🎲 Prépare tes affaires, on part ici !");
+    openDetailModal(escapadesAPlanifier[indexAleatoire]);
+});
+
 btnOpenAdd.addEventListener('click', () => {
     baladeEnCoursDeModificationId = null;
     form.reset();
     isDoneCheckbox.checked = false;
     dateDoneContainer.style.display = 'none';
     document.querySelector('#modal-add h2').innerText = "Créer une nouvelle escapade";
-    // Correction :
     document.querySelector('button[form="form-add-listing"]').innerText = "Ajouter à notre carte";
     modalAdd.showModal();
 });
@@ -179,11 +289,9 @@ function renderBalades(filtre = "Tout") {
     });
 }
 
-// --- ET L'ERREUR ÉTAIT AUSSI ICI ! C'EST CORRIGÉ ---
 function openEditModal(balade) {
     baladeEnCoursDeModificationId = balade.id;
     document.querySelector('#modal-add h2').innerText = "Modifier notre aventure 💖";
-    // Correction :
     document.querySelector('button[form="form-add-listing"]').innerText = "Enregistrer les modifications";
 
     document.getElementById('title').value = balade.title;
@@ -249,8 +357,6 @@ function updateGallery() {
 btnGalleryNext.addEventListener('click', () => { currentImageIndex = (currentImageIndex + 1) % currentBaladeInDetail.images.length; updateGallery(); });
 btnGalleryPrev.addEventListener('click', () => { currentImageIndex = (currentImageIndex - 1 + currentBaladeInDetail.images.length) % currentBaladeInDetail.images.length; updateGallery(); });
 
-searchBtns.forEach(btn => btn.addEventListener('click', () => alert("Pas besoin de chercher, tant qu'on est ensemble... 🥰")));
-
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     let rawCat = document.getElementById('category-input').value.trim();
@@ -290,5 +396,11 @@ form.addEventListener('submit', async (e) => {
     modalAdd.close();
     
     filtreActuel = finalCategory;
-    renderCategoriesBar();
+    
+    // Si on était sur le calendrier, on le rafraîchit
+    if(isCalendarMode) renderCalendar(); 
+    else {
+        renderCategoriesBar();
+        renderBalades(filtreActuel);
+    }
 });
