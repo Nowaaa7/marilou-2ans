@@ -14,9 +14,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// COLLE TA CLÉ IMGBB ICI 👇
-const IMGBB_API_KEY = "COLLE_TA_CLE_IMGBB_ICI";
-
 const modalAdd = document.getElementById('modal-add');
 const btnOpenAdd = document.getElementById('btn-open-add');
 const btnCloseAdd = document.getElementById('btn-close-add');
@@ -30,9 +27,8 @@ const btnCalendar = document.getElementById('btn-calendar');
 const calendarView = document.getElementById('calendar-view');
 let isCalendarMode = false;
 
-// NOUVEAU : LA CARTE MONDIALE
 let map;
-let markerGroup; // Pour pouvoir vider et re-remplir la carte proprement
+let markerGroup; 
 
 const modalDetail = document.getElementById('modal-detail');
 const btnCloseDetail = document.getElementById('btn-close-detail');
@@ -57,46 +53,33 @@ let filtreActuel = "Tout";
 let currentBaladeInDetail = null;
 let currentImageIndex = 0;
 let baladeEnCoursDeModificationId = null; 
-let imagesExistantes = []; 
 
-// --- INITIALISATION DE LA CARTE ---
 function initMap() {
-    // Crée la carte centrée sur l'Europe par défaut
     map = L.map('escapade-map').setView([48.85, 2.35], 5);
-    
-    // Ajoute le fond de carte "OpenStreetMap" (Gratuit !)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-
-    // Crée un groupe pour ranger les ronds photos
     markerGroup = L.layerGroup().addTo(map);
 }
 
-// Lancement de la carte au chargement de la page
 initMap();
 
-// --- AJOUTER LES COPAINS SUR LA CARTE ---
 function populateMap() {
-    // On vide l'ancienne carte avant
     markerGroup.clearLayers();
-    
-    // On prend toutes les balades qui ont des coordonnées
     const currentEscapades = balades.filter(b => b.lat && b.lng);
 
     currentEscapades.forEach(balade => {
-        // Crée une icône personnalisée avec la photo
+        let imgSrc = balade.images && balade.images.length > 0 ? balade.images[0] : 'https://api.dicebear.com/7.x/notionists/svg?seed=fallback';
         const photoIcon = L.divIcon({
-            className: 'custom-photo-marker', // On utilise le style du CSS
-            html: `<img src="${balade.images[0]}" class="photo-marker">`, // Première photo
-            iconSize: [40, 40], // Taille du rond
-            iconAnchor: [20, 40] // Centrage
+            className: 'custom-photo-marker', 
+            html: `<img src="${imgSrc}" class="photo-marker">`, 
+            iconSize: [40, 40], 
+            iconAnchor: [20, 40] 
         });
 
-        // Crée le marqueur (le copain) et l'ajoute au groupe
         L.marker([balade.lat, balade.lng], {icon: photoIcon})
          .addTo(markerGroup)
-         .addEventListener('click', () => openDetailModal(balade)); // Clique dessus = ouvre en grand
+         .addEventListener('click', () => openDetailModal(balade)); 
     });
 }
 
@@ -120,8 +103,6 @@ onSnapshot(q, (snapshot) => {
     });
 
     renderCategoriesBar();
-    
-    // Remplit la carte mondiale à chaque mise à jour des données
     populateMap();
     
     if(isCalendarMode) {
@@ -233,9 +214,7 @@ function renderCalendar() {
 
 btnOpenAdd.addEventListener('click', () => {
     baladeEnCoursDeModificationId = null;
-    imagesExistantes = []; 
     form.reset();
-    document.getElementById('image-upload').value = ""; 
     isDoneCheckbox.checked = false;
     dateDoneContainer.style.display = 'none';
     document.querySelector('#modal-add h2').innerText = "Créer une nouvelle escapade";
@@ -365,15 +344,11 @@ function renderBalades(filtre = "Tout", dateExacte = null) {
 
 function openEditModal(balade) {
     baladeEnCoursDeModificationId = balade.id;
-    imagesExistantes = balade.images || []; 
-    document.getElementById('image-upload').value = ""; 
-
     document.querySelector('#modal-add h2').innerText = "Modifier notre aventure 💖";
     document.querySelector('button[form="form-add-listing"]').innerText = "Enregistrer les modifications";
 
     document.getElementById('title').value = balade.title;
     document.getElementById('location').value = balade.location;
-    // Remplir les cases Latitude et Longitude en mode modification
     document.getElementById('lat').value = balade.lat || "";
     document.getElementById('lng').value = balade.lng || "";
     document.getElementById('mapsLink').value = balade.mapsLink || "";
@@ -381,6 +356,9 @@ function openEditModal(balade) {
     document.getElementById('budget').value = balade.budget || "Gratuit";
     document.getElementById('duration').value = balade.duration || "";
     document.getElementById('description').value = balade.description;
+    
+    // ON REMET LES LIENS DANS LA ZONE DE TEXTE
+    document.getElementById('images-urls').value = (balade.images || []).join('\n');
 
     isDoneCheckbox.checked = balade.isDone || false;
     if (balade.isDone) {
@@ -439,12 +417,6 @@ btnGalleryPrev.addEventListener('click', () => { currentImageIndex = (currentIma
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const submitBtn = document.querySelector('button[form="form-add-listing"]');
-    const originalText = submitBtn.innerText;
-    
-    submitBtn.innerText = "Envoi des photos en cours... ⏳";
-    submitBtn.disabled = true;
-    
     try {
         let rawCat = document.getElementById('category-input').value.trim();
         let finalCategory = rawCat.charAt(0).toUpperCase() + rawCat.slice(1);
@@ -453,46 +425,24 @@ form.addEventListener('submit', async (e) => {
         const dateDone = document.getElementById('date-done').value;
         const ratingValue = document.getElementById('pig-rating').value; 
 
-        // Récupérer Latitude et Longitude
         const lat = parseFloat(document.getElementById('lat').value);
         const lng = parseFloat(document.getElementById('lng').value);
 
-        const fileInput = document.getElementById('image-upload');
-        const files = fileInput.files;
-        let newImagesArray = [];
-
-        if (files.length > 0) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const formData = new FormData();
-                formData.append("image", file);
-
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: "POST",
-                    body: formData
-                });
-                
-                const data = await res.json();
-                
-                if(data.success) {
-                    newImagesArray.push(data.data.url); 
-                }
-            }
-        } else {
-            newImagesArray = imagesExistantes;
-        }
+        // ON REPREND LES LIENS COLLÉS
+        const imagesString = document.getElementById('images-urls').value;
+        const imagesArray = imagesString.split('\n').map(s => s.trim()).filter(s => s !== "");
 
         const dataBalade = {
             title: document.getElementById('title').value,
             location: document.getElementById('location').value,
-            lat: lat || null, // Sauvegarde les coordonnées
+            lat: lat || null,
             lng: lng || null,
             mapsLink: document.getElementById('mapsLink').value,
             budget: document.getElementById('budget').value,
             duration: document.getElementById('duration').value,
             category: finalCategory || "Aventure", 
             description: document.getElementById('description').value,
-            images: newImagesArray, 
+            images: imagesArray, 
             isDone: isDone,
             dateDone: isDone ? dateDone : null,
             rating: isDone ? ratingValue : null 
@@ -506,7 +456,6 @@ form.addEventListener('submit', async (e) => {
         }
         
         form.reset();
-        document.getElementById('image-upload').value = "";
         isDoneCheckbox.checked = false;
         dateDoneContainer.style.display = 'none';
         modalAdd.close();
@@ -522,8 +471,5 @@ form.addEventListener('submit', async (e) => {
     } catch (error) {
         console.error(error);
         alert("Erreur lors de l'envoi de la balade !");
-    } finally {
-        submitBtn.innerText = originalText;
-        submitBtn.disabled = false;
     }
 });
